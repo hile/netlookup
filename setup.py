@@ -8,7 +8,7 @@ setup(
     description='python tools to look up information about networks',
     author='Ilkka Tuohela',
     author_email='hile@iki.fi',
-    url='https://ci.tuohela.net/systematic-networks/',
+    url='https://git.tuohela.net/systematic-components/systematic-networks',
     version=__version__,
     license='PSF',
     packages=find_packages(),
