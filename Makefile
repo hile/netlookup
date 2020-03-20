@@ -1,6 +1,6 @@
-#
-# Install the scrips, configs and python modules
-#
+
+MODULE := systematic_networks
+VERSION := $(shell awk '/^__version__/ {print $$3}' ${MODULE}/version.py)
 
 all: lint test
 
@@ -14,7 +14,7 @@ build:
 	python setup.py build
 
 lint:
-	pylint systematic_networks tests setup.py
+	pylint ${MODULE} tests setup.py
 	flake8 | sort
 
 test:
@@ -23,5 +23,9 @@ test:
 upload: clean
 	python3 setup.py sdist bdist_wheel
 	twine upload dist/*
+
+tag-release:
+	git tag -a ${VERSION} -m "Publish release ${VERSION}"
+	git push origin ${VERSION}
 
 .PHONY: all test

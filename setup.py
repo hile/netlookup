@@ -22,7 +22,7 @@ setup(
         'dnspython',
         'netaddr',
         'requests',
-        'systematic-cli',
+        'systematic-cli==20200320.1',
     ),
     setup_requires=['tox'],
     tests_require=(),
