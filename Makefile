@@ -1,6 +1,6 @@
 
 MODULE := systematic_networks
-VERSION := $(shell awk '/^__version__/ {print $$3}' ${MODULE}/version.py)
+VERSION := $(shell awk '/^__version__/ {print $$3}' ${MODULE}/__init__.py)
 
 all: lint test
 

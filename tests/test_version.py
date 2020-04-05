@@ -1,11 +1,10 @@
 
-from systematic_networks.version import __version__
+from systematic_networks import __version__
+from systematic_cli.tests import validate_version_string
 
 
 def test_version_string():
     """
     Test format of module version string
     """
-    parts = __version__.split('.')
-    for part in parts:
-        assert int(part) >= 0
+    validate_version_string(__version__)
