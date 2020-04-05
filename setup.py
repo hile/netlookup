@@ -1,6 +1,6 @@
 
 from setuptools import setup, find_packages
-from systematic_networks.version import __version__
+from systematic_networks import __version__
 
 setup(
     name='systematic-networks',
@@ -22,7 +22,7 @@ setup(
         'dnspython',
         'netaddr',
         'requests',
-        'systematic-cli==20200320.1',
+        'systematic-cli>=20200320.1',
     ),
     setup_requires=['tox'],
     tests_require=(),
