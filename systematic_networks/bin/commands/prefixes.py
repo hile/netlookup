@@ -26,7 +26,7 @@ class PrefixLookup(BaseCommand):
             try:
                 prefixes.update()
             except Exception as error:
-                self.exit(1, 'Error updating prefix caches: {}'.format(error))
+                self.exit(1, f'Error updating prefix caches: {error}')
 
         for address in args.addresses:
             try:
@@ -34,4 +34,4 @@ class PrefixLookup(BaseCommand):
                 if address:
                     self.message(address)
             except Exception as error:
-                self.error('Error looking up address {}: {}'.format(address, error))
+                self.error(f'Error looking up address {address}: {error}')

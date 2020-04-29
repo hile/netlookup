@@ -7,7 +7,7 @@
 /.cache/
 /.eggs/
 /.tox
-/.coverage
+/.htmlcov
 /coverage
 .*.swp
 *.pyc

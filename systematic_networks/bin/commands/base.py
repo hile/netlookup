@@ -17,6 +17,6 @@ class BaseCommand(Command):
                 for arg in args.subnets:
                     self.networks.append(Network(arg))
             except Exception as error:
-                self.exit(1, 'Error parsing subnets: {}'.format(error))
+                self.exit(1, f'Error parsing subnets: {error}')
 
         return args

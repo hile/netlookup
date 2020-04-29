@@ -38,7 +38,7 @@ class Prefixes(NetworkList):
                 vendor.fetch()
                 vendor.save()
             except Exception as error:
-                raise NetworkError('Error updating {} data: {}'.format(vendor, error))
+                raise NetworkError(f'Error updating {vendor} data: {error}')
         self.load()
 
     def save(self):
@@ -73,7 +73,7 @@ class Prefixes(NetworkList):
         for vendor in self.vendors:
             if vendor.type == name:
                 return vendor
-        raise NetworkError('No such vendor: {}'.format(name))
+        raise NetworkError(f'No such vendor: {name}')
 
     def find(self, value):
         """

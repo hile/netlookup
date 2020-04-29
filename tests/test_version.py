@@ -1,6 +1,6 @@
 
-from systematic_networks import __version__
 from systematic_cli.tests import validate_version_string
+from systematic_networks import __version__
 
 
 def test_version_string():

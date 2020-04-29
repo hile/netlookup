@@ -67,7 +67,7 @@ class NetworkSet:
             try:
                 self.cache_directory.mkdir(parents=True)
             except Exception as error:
-                raise NetworkError('Error creating directory {}: {}'.format(self.cache_directory, error))
+                raise NetworkError(f'Error creating directory {self.cache_directory}: {error}')
 
         self.load()
         if networks is not None:
@@ -138,7 +138,7 @@ class NetworkSet:
         try:
             network = self.loader_class(value)
         except Exception as error:
-            raise NetworkError('Error parsing network {}: {}'.format(value, error))
+            raise NetworkError(f'Error parsing network {value}: {error}')
         if network not in self.__networks__:
             self.__networks__.append(network)
 
@@ -153,7 +153,7 @@ class NetworkSet:
             try:
                 ipset.remove(network)
             except AddrFormatError as error:
-                raise NetworkError('Error processing network {}: {}'.format(network, error))
+                raise NetworkError(f'Error processing network {network}: {error}')
         return [self.loader_class(network) for network in ipset.iter_cidrs()]
 
     def __read_cache_file__(self):
@@ -164,10 +164,7 @@ class NetworkSet:
             with self.cache_file.open('r') as filedescriptor:
                 return filedescriptor.read()
         except Exception as error:
-            raise NetworkError('Error reading cache file {}: {}'.format(
-                self.cache_file,
-                error
-            ))
+            raise NetworkError(f'Error reading cache file {self.cache_file}: {error}')
 
     def load(self):
         """
@@ -180,10 +177,7 @@ class NetworkSet:
         try:
             data = json.loads(data)
         except Exception as error:
-            raise NetworkError('Error parsing JSON data from cache file {}: {}'.format(
-                self.cache_file,
-                error
-            ))
+            raise NetworkError(f'Error parsing JSON data from cache file {self.cache_file}: {error}')
 
         self.__networks__.clear()
         try:
@@ -192,27 +186,19 @@ class NetworkSet:
                 prefix = self.loader_class(record['cidr'], record)
                 self.__networks__.append(prefix)
         except Exception as error:
-            raise NetworkError('Error loading data from cache file {}: {}'.format(
-                self.cache_file,
-                error
-            ))
+            raise NetworkError(f'Error loading data from cache file {self.cache_file}: {error}')
 
     def save(self):
         """
         Save data to cache file
         """
         if self.cache_file is None:
-            raise NetworkError(
-                'Network set does not define cache filename: {}'.format(self)
-            )
+            raise NetworkError(f'Network set does not define cache filename: {self}')
         try:
             with self.cache_file.open('w') as filedescriptor:
                 filedescriptor.write('{}\n'.format(json.dumps(self.as_dict(), indent=2)))
         except Exception as error:
-            raise NetworkError('Error writing cache file {}: {}'.format(
-                self.cache_file,
-                error
-            ))
+            raise NetworkError(f'Error writing cache file {self.cache_file}: {error}')
 
     def find(self, value):
         """

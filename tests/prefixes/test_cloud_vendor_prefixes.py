@@ -15,7 +15,7 @@ from systematic_networks.network_sets.google import GoogleServices, GoogleServic
 
 from ..constants import MATCH_PREFIXES_LOOKUPS, INVALID_ADDRESS_LOOKUPS
 
-DATA_PATH = Path(Path(__file__).parent.absolute(), 'data')
+DATA_PATH = Path(__file__).parent.absolute().joinpath('data')
 
 TEST_DATA_PREFIX_LEN = 4085
 TEST_NETWORK_ADDRESSES = (

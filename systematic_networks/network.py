@@ -43,7 +43,7 @@ def parse_address_or_network(value):
     try:
         return Network(value)
     except AddrFormatError:
-        raise NetworkError('Error parsing address or network from {}'.format(value))
+        raise NetworkError(f'Error parsing address or network from {value}')
 
 
 class NetworkError(Exception):
@@ -105,8 +105,8 @@ class Network(IPNetwork):
     @property
     def total_hosts(self):
         """
-        Return total number of available hosts in subnet, excluding network and broadcast
-        addresses
+        Return total number of available hosts in subnet, excluding network and
+        broadcast addresses
         """
         if self.version == 4:
             if self.prefixlen == 31:
@@ -197,9 +197,8 @@ class Network(IPNetwork):
                 raise AddrFormatError('Invalid IPv4 prefix len')
 
         if prefixlen <= self.prefixlen:
-            raise AddrFormatError('Split mask {} is not valid for prefixlen {}'.format(
-                prefixlen,
-                self.prefixlen
-            ))
+            raise AddrFormatError(
+                f'Split mask {prefixlen} is not valid for prefixlen {self.prefixlen}'
+            )
 
         return super().subnet(prefixlen, count, fmt)

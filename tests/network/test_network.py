@@ -26,7 +26,7 @@ def validate_network_compare_methods(network):
         assert host >= network
 
     try:
-        next_network = network.next()
+        next_network = network.next()  # noqa
         assert next_network > network
         assert next_network >= network
     except IndexError:

@@ -25,7 +25,7 @@ class AzurePrefix(NetworkSetItem):
         super().__init__(network, data)
 
     def __repr__(self):
-        return '{} {} {}'.format(self.type, self.region, self.cidr)
+        return f'{self.type} {self.region} {self.cidr}'
 
     def as_dict(self):
         """
@@ -58,10 +58,10 @@ class Azure(NetworkSet):
                 headers={'Content-Type': 'application/json'}
             )
             if res.status_code != 200:
-                raise ValueError('HTTP status code {}'.format(res.status_code))
+                raise ValueError(f'HTTP status code {res.status_code}')
             return res.content
         except Exception as error:
-            raise NetworkError('Error fetching azure IP ranges: {}'.format(error))
+            raise NetworkError(f'Error fetching azure IP ranges: {error}')
 
     def fetch(self):
         """
@@ -70,7 +70,7 @@ class Azure(NetworkSet):
         try:
             data = json.loads(self.__get_azure_ip_ranges__())
         except Exception as error:
-            raise NetworkError('Error loading azure IP range data: {}'.format(error))
+            raise NetworkError(f'Error loading azure IP range data: {error}')
 
         self.__networks__.clear()
         for region in data:
@@ -90,11 +90,8 @@ class Azure(NetworkSet):
                     self.__networks__.append(self.loader_class(prefix, kwargs))
                 except Exception as error:
                     raise NetworkError(
-                        'Error parsing region {} prefix "{}": {}'.format(
-                            region,
-                            data.get(region, []),
-                            error
-                        ))
+                        f'Error parsing region {region} prefix "{data.get(region, [])}": {error}'
+                    )
 
         self.updated = datetime.now()
         self.__networks__.sort(key=attrgetter('region'))

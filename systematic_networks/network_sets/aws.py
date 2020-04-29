@@ -28,7 +28,7 @@ class AWSPrefix(NetworkSetItem):
         super().__init__(network, data)
 
     def __repr__(self):
-        return '{} {} {}'.format(self.type, self.region, self.cidr)
+        return f'{self.type} {self.region} {self.cidr}'
 
 
 class AWS(NetworkSet):
@@ -54,10 +54,10 @@ class AWS(NetworkSet):
         try:
             res = requests.get(AWS_IP_RANGES_URL)
             if res.status_code != 200:
-                raise ValueError('HTTP status code {}'.format(res.status_code))
+                raise ValueError(f'HTTP status code {res.status_code}')
             return res.content
         except Exception as error:
-            raise NetworkError('Error fetching AWS IP ranges: {}'.format(error))
+            raise NetworkError(f'Error fetching AWS IP ranges: {error}')
 
     def fetch(self):
         """
@@ -67,7 +67,7 @@ class AWS(NetworkSet):
         try:
             data = json.loads(self.__get_aws_ip_ranges__())
         except Exception as error:
-            raise NetworkError('Error loading AWS IP range data: {}'.format(error))
+            raise NetworkError(f'Error loading AWS IP range data: {error}')
 
         self.updated = datetime.fromtimestamp(int(data['syncToken']))
         networks = {}

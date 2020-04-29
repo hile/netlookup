@@ -29,10 +29,11 @@ class Split(BaseCommand):
         for network in self.networks:
             prefixlen = args.mask if args.mask is not None else network.next_subnet_prefix
             if prefixlen is not None:
+                # pylint: disable=broad-except
                 try:
                     for subnet in network.subnet(prefixlen):
                         self.message(subnet)
                 except Exception as error:
-                    self.error('Error splitting {}: {}'.format(network, error))
+                    self.error(f'Error splitting {network}: {error}')
             else:
-                self.error('Network is not splittable {}'.format(network))
+                self.error(f'Network is not splittable {network}')
