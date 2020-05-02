@@ -119,6 +119,7 @@ def test_cloud_vendor_prefixes_missing_directory():
     assert len(prefixes) == 0
 
 
+# pylint: disable=unused-argument,redefined-outer-name
 def test_cloud_vendor_prefixes_missing_directory_create_error(mock_path_mkdir_permission_denied):
     """
     Test creating cache directory
@@ -159,6 +160,7 @@ def test_cloud_vendor_prefixes_networks_save():
         assert len(vendor) > 0
 
 
+# pylint: disable=unused-argument
 def test_cloud_vendor_prefixes_networks_save_no_permission(mock_open_permission_denied):
     """
     Test saving networks to files without permissions
