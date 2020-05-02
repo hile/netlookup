@@ -6,6 +6,8 @@ from pathlib import Path
 
 import pytest
 
+from systematic_networks.network_sets import base
+
 from systematic_networks.network import NetworkError
 from systematic_networks.prefixes import Prefixes
 from systematic_networks.network_sets.aws import AWS, AWSPrefix
@@ -68,6 +70,20 @@ TEST_FILTER_COUNTS = {
 }
 
 
+@pytest.fixture
+def mock_open_permission_denied(monkeypatch):
+    """
+    Fixture to mock
+    """
+    # pylint: disable=unused-argument
+    def permission_denied(*args):
+        """
+        Always return false for os.access
+        """
+        raise PermissionError
+    monkeypatch.setattr(base.Path, 'open', permission_denied)
+
+
 def validate_prefix_list(network_set, loader_class):
     """
     Validate prefix list
@@ -103,7 +119,7 @@ def test_cloud_vendor_prefixes_missing_directory():
     assert len(prefixes) == 0
 
 
-def test_cloud_vendor_prefixes_missing_directory_create_error():
+def test_cloud_vendor_prefixes_missing_directory_create_error(mock_path_mkdir_permission_denied):
     """
     Test creating cache directory
     """
@@ -143,7 +159,7 @@ def test_cloud_vendor_prefixes_networks_save():
         assert len(vendor) > 0
 
 
-def test_cloud_vendor_prefixes_networks_save_no_permission():
+def test_cloud_vendor_prefixes_networks_save_no_permission(mock_open_permission_denied):
     """
     Test saving networks to files without permissions
     """
@@ -154,14 +170,9 @@ def test_cloud_vendor_prefixes_networks_save_no_permission():
         assert len(vendor) == 0
         next(vendor)
         assert len(vendor) > 0
-    prefixes.save()
 
-    for vendor in prefixes.vendors:
-        vendor.cache_file.chmod(int('0000', 8))
     with pytest.raises(NetworkError):
         prefixes.save()
-    for vendor in prefixes.vendors:
-        vendor.cache_file.chmod(int('0644', 8))
 
 
 def test_cloud_vendor_networks_loading():
