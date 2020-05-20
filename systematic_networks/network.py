@@ -4,6 +4,8 @@ from bisect import bisect_left
 from netaddr.ip import IPNetwork, IPAddress
 from netaddr.core import AddrFormatError
 
+from .exceptions import NetworkError
+
 
 def find_address_in_networks(networks, value):
     """
@@ -44,12 +46,6 @@ def parse_address_or_network(value):
         return Network(value)
     except AddrFormatError:
         raise NetworkError(f'Error parsing address or network from {value}')
-
-
-class NetworkError(Exception):
-    """
-    Errors caused by network sets
-    """
 
 
 class NetworkList(list):
