@@ -34,11 +34,11 @@ class WhoisQueryResponse(Base):
 
     def __init__(self, whois, debug_enabled=False, silent=False):
         super().__init__(debug_enabled=debug_enabled, silent=silent)
+        self.whois = whois
         self.__query_type__ = None
         self.__query__ = None
         self.__stdout__ = None
         self.__stderr__ = None
-        self.whois = whois
         self.__loaded__ = None
         self.groups = []
         self.address_ranges = []
@@ -57,7 +57,7 @@ class WhoisQueryResponse(Base):
         Return smallest network for a response
         """
         if self.networks:
-            return str(self.networks[0])
+            return self.networks[0]
         return None
 
     # pylint: disable=too-many-nested-blocks
@@ -170,7 +170,7 @@ class WhoisQueryResponse(Base):
         for field in fields:
             if field == '' or len(field.split()) > 1:
                 raise WhoisQueryError(f'invalid whois query {query}')
-        return 'dns'
+        return 'domain'
 
     def __load_data__(self, stdout, stderr, query_type=None, loaded_timestamp=None):
         """
@@ -190,7 +190,7 @@ class WhoisQueryResponse(Base):
             self.__loaded__ = datetime.now().timestamp()
 
         if self.__query_type__ is None:
-            self.__query_type__ = 'address' if self.address_ranges is not None else 'dns'
+            self.__query_type__ = 'address' if self.address_ranges else 'domain'
 
     def query(self, query):
         """

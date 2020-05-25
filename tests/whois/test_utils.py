@@ -48,6 +48,10 @@ def test_whois_utils_lookup_field_alias():
     """
     response = WhoisQueryResponse(WhoisAddressLookup())
     assert lookup_field_alias(response, 'testalias') == ('testalias', None)
+    assert lookup_field_alias(response, 'org_routing_phone') == (
+        'phone',
+        GLOBAL_FIELD_MAP['phone']
+    )
     assert lookup_field_alias(response, 'billing_c') == (
         'billing_c',
         GLOBAL_FIELD_MAP['billing_c']

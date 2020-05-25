@@ -23,7 +23,7 @@ setup(
         'inflection>=0.4.0',
         'netaddr>=0.7.19',
         'requests>=2.23.0',
-        'systematic-cli>=1.0.0',
+        'systematic-cli>=1.1.0',
     ),
     setup_requires=['tox'],
     tests_require=(),
