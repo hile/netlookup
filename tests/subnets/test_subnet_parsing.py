@@ -3,7 +3,7 @@ import pytest
 
 from netaddr.core import AddrFormatError
 
-from systematic_networks.network import Network
+from netlookup.network import Network
 from ..constants import VALID_SUBNET_VALUES, INVALID_SUBNET_VALUES, MAX_SPLITS
 
 

@@ -8,11 +8,11 @@ import pytest
 
 from netaddr.ip import IPNetwork, IPRange
 
-from systematic_networks.exceptions import WhoisQueryError
-from systematic_networks.whois.constants import GLOBAL_FIELD_MAP
-from systematic_networks.whois.lookup import WhoisAddressLookup
-from systematic_networks.whois.response import WhoisQueryResponse
-from systematic_networks.whois.utils import (
+from netlookup.exceptions import WhoisQueryError
+from netlookup.whois.constants import GLOBAL_FIELD_MAP
+from netlookup.whois.lookup import WhoisAddressLookup
+from netlookup.whois.response import WhoisQueryResponse
+from netlookup.whois.utils import (
     lookup_field_alias,
     parse_datetime,
     parse_field_value,

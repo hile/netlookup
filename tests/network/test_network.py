@@ -4,7 +4,7 @@ import pytest
 from netaddr.core import AddrFormatError
 from netaddr.ip import IPAddress
 
-from systematic_networks.network import Network, NetworkError, parse_address_or_network
+from netlookup.network import Network, NetworkError, parse_address_or_network
 from ..constants import VALID_SUBNET_VALUES, INVALID_SUBNET_VALUES
 
 

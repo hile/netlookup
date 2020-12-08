@@ -1,8 +1,8 @@
 """
-Unit tests for systematic_networks.whois.lookup module
+Unit tests for netlookup.whois.lookup module
 """
 
-from systematic_networks.whois.lookup import WhoisAddressLookup
+from netlookup.whois.lookup import WhoisAddressLookup
 from .mock import TEST_CACHE, TEST_CACHE_SIZE
 
 
@@ -29,7 +29,7 @@ def test_whois_cache_load(monkeypatch):
     Test loading cache from test data file
     """
     monkeypatch.setattr(
-        'systematic_networks.whois.lookup.DEFAULT_CACHE_FILE',
+        'netlookup.whois.lookup.DEFAULT_CACHE_FILE',
         TEST_CACHE
     )
     whois = WhoisAddressLookup()

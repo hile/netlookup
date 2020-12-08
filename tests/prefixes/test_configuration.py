@@ -2,9 +2,9 @@
 from pathlib import Path
 from unittest.mock import patch
 
-from systematic_networks.network_sets.base import NetworkSet
-from systematic_networks.prefixes import Prefixes
-from systematic_networks.network_sets.configuration import (
+from netlookup.network_sets.base import NetworkSet
+from netlookup.prefixes import Prefixes
+from netlookup.network_sets.configuration import (
     get_cache_directory,
     DARWIN_CACHE_DIRECTORY,
     DEFAULT_CACHE_DIRECTORY

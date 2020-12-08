@@ -1,7 +1,7 @@
 
-from systematic_networks.network_sets.utils import google_rr_dns_query
-from systematic_networks.network_sets.gcp import ADDRESS_LIST_RECORD as GCP_TXT_RECORD
-from systematic_networks.network_sets.google import ADDRESS_LIST_RECORD as GOOGLE_TXT_RECORD
+from netlookup.network_sets.utils import google_rr_dns_query
+from netlookup.network_sets.gcp import ADDRESS_LIST_RECORD as GCP_TXT_RECORD
+from netlookup.network_sets.google import ADDRESS_LIST_RECORD as GOOGLE_TXT_RECORD
 
 INVALID_QUERY = '_invalid.example.com'
 NO_TXT_QUERY = 'git.tuohela.net'

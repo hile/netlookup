@@ -6,14 +6,14 @@ from pathlib import Path
 
 import pytest
 
-from systematic_networks.network_sets import base
+from netlookup.network_sets import base
 
-from systematic_networks.network import NetworkError
-from systematic_networks.prefixes import Prefixes
-from systematic_networks.network_sets.aws import AWS, AWSPrefix
-from systematic_networks.network_sets.azure import Azure, AzurePrefix
-from systematic_networks.network_sets.gcp import GCP, GCPPrefix
-from systematic_networks.network_sets.google import GoogleServices, GoogleServicePrefix
+from netlookup.network import NetworkError
+from netlookup.prefixes import Prefixes
+from netlookup.network_sets.aws import AWS, AWSPrefix
+from netlookup.network_sets.azure import Azure, AzurePrefix
+from netlookup.network_sets.gcp import GCP, GCPPrefix
+from netlookup.network_sets.google import GoogleServices, GoogleServicePrefix
 
 from ..constants import MATCH_PREFIXES_LOOKUPS, INVALID_ADDRESS_LOOKUPS
 

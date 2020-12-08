@@ -1,6 +1,6 @@
 ---
 #
-# Gitlab CI pipeline for systematic-cli module
+# Gitlab CI pipeline for netlookup module
 #
 
 image:

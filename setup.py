@@ -1,21 +1,21 @@
 
 from setuptools import setup, find_packages
-from systematic_networks import __version__
+from netlookup import __version__
 
 setup(
-    name='systematic-networks',
+    name='netlookup',
     keywords='network subnet lookup utilities',
-    description='python tools to look up information about networks',
+    description='Python tools to look up information about networks',
     author='Ilkka Tuohela',
     author_email='hile@iki.fi',
-    url='https://git.tuohela.net/systematic-components/systematic-networks',
+    url='https://git.tuohela.net/python/netlookup',
     version=__version__,
     license='PSF',
     packages=find_packages(),
     python_requires='>3.6.0',
     entry_points={
         'console_scripts': [
-            'netlookup=systematic_networks.bin.netlookup:main',
+            'netlookup=netlookup.bin.netlookup:main',
         ],
     },
     install_requires=(
@@ -23,7 +23,7 @@ setup(
         'inflection>=0.4.0',
         'netaddr>=0.7.19',
         'requests>=2.23.0',
-        'systematic-cli>=1.1.0',
+        'cli-toolkit>=1.0.0',
     ),
     setup_requires=['tox'],
     tests_require=(),

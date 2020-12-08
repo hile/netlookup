@@ -1,6 +1,6 @@
 
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-MODULE := systematic_networks
+MODULE := netlookup
 VERSION := $(shell awk '/^__version__/ {print $$3}' ${MODULE}/__init__.py)
 SPHINX_FLAGS := -b html ./docs public
 SPHINX_WEBSITE_FLAGS := --port 8100 --host localhost --open-browser --watch ${MODULE}

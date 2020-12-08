@@ -5,8 +5,8 @@ from unittest.mock import patch
 
 import pytest
 
-from systematic_networks.network import NetworkError
-from systematic_networks.prefixes import Prefixes
+from netlookup.network import NetworkError
+from netlookup.prefixes import Prefixes
 
 INVALID_URL = 'http://tuohela.net/invalid-url-test'
 
@@ -72,7 +72,7 @@ def test_cloud_vendor_aws_fetch_error():
     prefixes = Prefixes(cache_directory=tempdir)
     vendor = prefixes.get_vendor('aws')
 
-    with patch('systematic_networks.network_sets.aws.AWS_IP_RANGES_URL', INVALID_URL):
+    with patch('netlookup.network_sets.aws.AWS_IP_RANGES_URL', INVALID_URL):
         with pytest.raises(NetworkError):
             vendor.fetch()
 
@@ -98,7 +98,7 @@ def test_cloud_vendor_azure_fetch_error():
     prefixes = Prefixes(cache_directory=tempdir)
     vendor = prefixes.get_vendor('azure')
 
-    with patch('systematic_networks.network_sets.azure.AZURE_SERVICES_URL', INVALID_URL):
+    with patch('netlookup.network_sets.azure.AZURE_SERVICES_URL', INVALID_URL):
         with pytest.raises(NetworkError):
             vendor.fetch()
 

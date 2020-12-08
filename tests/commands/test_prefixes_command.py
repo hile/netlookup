@@ -4,8 +4,8 @@ from unittest.mock import patch
 
 import pytest
 
-from systematic_networks.bin.netlookup import main
-from systematic_networks.network import NetworkError
+from netlookup.bin.netlookup import main
+from netlookup.network import NetworkError
 
 
 def mock_fail_vendor_update():
@@ -44,7 +44,7 @@ def test_commands_prefixes_update_cache_fail(mock_method):
     Test updating prefixes cache
     """
     test_args = ['netlookup', 'prefixes', '--update']
-    with patch('systematic_networks.prefixes.AWS.fetch', mock_fail_vendor_update):
+    with patch('netlookup.prefixes.AWS.fetch', mock_fail_vendor_update):
         with patch.object(sys, 'argv', test_args):
             with pytest.raises(SystemExit) as exit_code:
                 main()

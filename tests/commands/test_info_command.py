@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import pytest
 
-from systematic_networks.bin.netlookup import main
+from netlookup.bin.netlookup import main
 
 
 def mock_message_callback(*args):

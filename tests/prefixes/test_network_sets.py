@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from systematic_networks.network import Network, NetworkError
-from systematic_networks.network_sets.base import (
+from netlookup.network import Network, NetworkError
+from netlookup.network_sets.base import (
     NetworkSet,
     NetworkSetItem,
 )

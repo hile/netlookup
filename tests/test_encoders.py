@@ -8,7 +8,7 @@ from datetime import datetime
 
 from netaddr.ip import IPAddress, IPNetwork, IPRange
 
-from systematic_networks.encoders import NetworkDataEncoder
+from netlookup.encoders import NetworkDataEncoder
 
 
 def validate_network_json_dump(testdata):
