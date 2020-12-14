@@ -19,11 +19,11 @@ setup(
         ],
     },
     install_requires=(
+        'cli-toolkit>=1.0.0',
         'dnspython>=1.16.0',
         'inflection>=0.4.0',
         'netaddr>=0.7.19',
         'requests>=2.23.0',
-        'cli-toolkit>=1.0.0',
     ),
     setup_requires=['tox'],
     tests_require=(),
