@@ -19,7 +19,7 @@ setup(
         ],
     },
     install_requires=(
-        'cli-toolkit>=1.0.0',
+        'cli-toolkit>=1.0.2',
         'dnspython>=1.16.0',
         'inflection>=0.4.0',
         'netaddr>=0.7.19',
