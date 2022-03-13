@@ -44,8 +44,8 @@ def parse_address_or_network(value):
         pass
     try:
         return Network(value)
-    except AddrFormatError:
-        raise NetworkError(f'Error parsing address or network from {value}')
+    except AddrFormatError as error:
+        raise NetworkError(f'Error parsing address or network from {value}') from error
 
 
 class NetworkList(list):

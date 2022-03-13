@@ -27,7 +27,7 @@ class NetworkSetItem(Network):
                     setattr(self, attr, data[attr])
 
     def __repr__(self):
-        return '{} {}'.format(self.type, self.cidr)
+        return f'{self.type} {self.cidr}'
 
     def __str__(self):
         return self.__repr__()
@@ -67,7 +67,7 @@ class NetworkSet:
             try:
                 self.cache_directory.mkdir(parents=True)
             except Exception as error:
-                raise NetworkError(f'Error creating directory {self.cache_directory}: {error}')
+                raise NetworkError(f'Error creating directory {self.cache_directory}: {error}') from error
 
         self.load()
         if networks is not None:
@@ -89,9 +89,9 @@ class NetworkSet:
             item = self.__networks__[self.__iter_index__]
             self.__iter_index__ += 1
             return item
-        except IndexError:
+        except IndexError as error:
             self.__iter_index__ = None
-            raise StopIteration
+            raise StopIteration from error
 
     @property
     def cache_file(self):
@@ -107,7 +107,9 @@ class NetworkSet:
         """
         IPSet of networks in network set
         """
-        return IPSet(self.__networks__)
+        for network in self.__networks__:
+            print('network', network, type(network))
+        return IPSet([item.cidr for item in self.__networks__])
 
     @property
     def merged(self):
@@ -138,7 +140,7 @@ class NetworkSet:
         try:
             network = self.loader_class(value)
         except Exception as error:
-            raise NetworkError(f'Error parsing network {value}: {error}')
+            raise NetworkError(f'Error parsing network {value}: {error}') from error
         if network not in self.__networks__:
             self.__networks__.append(network)
 
@@ -153,7 +155,7 @@ class NetworkSet:
             try:
                 ipset.remove(network)
             except AddrFormatError as error:
-                raise NetworkError(f'Error processing network {network}: {error}')
+                raise NetworkError(f'Error processing network {network}: {error}') from error
         return [self.loader_class(network) for network in ipset.iter_cidrs()]
 
     def __read_cache_file__(self):
@@ -161,10 +163,10 @@ class NetworkSet:
         Read network set data cache file
         """
         try:
-            with self.cache_file.open('r') as filedescriptor:
+            with self.cache_file.open('r', encoding='utf-8') as filedescriptor:
                 return filedescriptor.read()
         except Exception as error:
-            raise NetworkError(f'Error reading cache file {self.cache_file}: {error}')
+            raise NetworkError(f'Error reading cache file {self.cache_file}: {error}') from error
 
     def load(self):
         """
@@ -177,7 +179,7 @@ class NetworkSet:
         try:
             data = json.loads(data)
         except Exception as error:
-            raise NetworkError(f'Error parsing JSON data from cache file {self.cache_file}: {error}')
+            raise NetworkError(f'Error parsing JSON data from cache file {self.cache_file}: {error}') from error
 
         self.__networks__.clear()
         try:
@@ -186,7 +188,7 @@ class NetworkSet:
                 prefix = self.loader_class(record['cidr'], record)
                 self.__networks__.append(prefix)
         except Exception as error:
-            raise NetworkError(f'Error loading data from cache file {self.cache_file}: {error}')
+            raise NetworkError(f'Error loading data from cache file {self.cache_file}: {error}') from error
 
     def save(self):
         """
@@ -195,10 +197,10 @@ class NetworkSet:
         if self.cache_file is None:
             raise NetworkError(f'Network set does not define cache filename: {self}')
         try:
-            with self.cache_file.open('w') as filedescriptor:
-                filedescriptor.write('{}\n'.format(json.dumps(self.as_dict(), indent=2)))
+            with self.cache_file.open('w', encoding='utf-8') as filedescriptor:
+                filedescriptor.write(f'{json.dumps(self.as_dict(), indent=2)}\n')
         except Exception as error:
-            raise NetworkError(f'Error writing cache file {self.cache_file}: {error}')
+            raise NetworkError(f'Error writing cache file {self.cache_file}: {error}') from error
 
     def find(self, value):
         """

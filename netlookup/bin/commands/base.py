@@ -10,7 +10,10 @@ class BaseCommand(Command):
     """
     networks = []
 
-    def parse_args(self, args):
+    def parse_args(self, args=None, namespace=None):
+        """
+        Parse common arguments for netlookup commands
+        """
         self.networks = []
         if 'subnets' in args:
             try:

@@ -13,7 +13,7 @@ def google_rr_dns_query(record):
     DNS query to get TXT record list of google networks
     """
     try:
-        res = resolver.query(record, 'TXT')
+        res = resolver.resolve(record, 'TXT')
         return str(res.rrset[0].strings[0], 'utf-8')
     except (resolver.NoAnswer, resolver.NXDOMAIN):
         return None

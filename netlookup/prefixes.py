@@ -38,7 +38,7 @@ class Prefixes(NetworkList):
                 vendor.fetch()
                 vendor.save()
             except Exception as error:
-                raise NetworkError(f'Error updating {vendor} data: {error}')
+                raise NetworkError(f'Error updating {vendor} data: {error}') from error
         self.load()
 
     def save(self):

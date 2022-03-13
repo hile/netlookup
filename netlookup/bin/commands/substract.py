@@ -29,7 +29,7 @@ class Subtract(BaseCommand):
             help='Subnets to subtract from'
         )
 
-    def parse_args(self, args):
+    def parse_args(self, args=None, namespace=None):
         """
         Parse subnet arguments
         """

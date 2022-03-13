@@ -94,7 +94,7 @@ def parse_network_value(value):
         try:
             return [IPRange(start, end)]
         except (AddrFormatError, ValueError) as error:
-            raise WhoisQueryError(f'Error parsing network field value {value}: {error}')
+            raise WhoisQueryError(f'Error parsing network field value {value}: {error}') from error
     except ValueError:
         pass
 
@@ -104,5 +104,5 @@ def parse_network_value(value):
         try:
             networks.append(IPNetwork(item))
         except (AddrFormatError, ValueError) as error:
-            raise WhoisQueryError(f'Error parsing network field value {value}: {error}')
+            raise WhoisQueryError(f'Error parsing network field value {value}: {error}') from error
     return networks

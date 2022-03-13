@@ -9,9 +9,9 @@ from operator import attrgetter
 
 from netaddr.ip import IPAddress, AddrFormatError
 
-from cli_toolkit.base import Base
-from cli_toolkit.exceptions import ScriptError
-from cli_toolkit.process import run_command_lineoutput
+from sys_toolkit.base import LoggingBaseClass
+from sys_toolkit.exceptions import CommandError
+from sys_toolkit.subprocess import run_command_lineoutput
 
 from ..encoders import NetworkDataEncoder
 from ..exceptions import WhoisQueryError
@@ -25,22 +25,126 @@ LINE_ENCODINGS = ('utf-8', 'latin1')
 QUERY_TIMEOUT = 10
 
 
-class WhoisQueryResponse(Base):
+class BaseQueryResponse(LoggingBaseClass):
     """
-    Query whois
+    Common base class for query responses
     """
-    __group_loaders__ = GROUP_LOADERS
-    __fallback_group_loader__ = InformationSectionGroup
+    __group_loaders__ = None
+    __fallback_group_loader__ = None
 
     def __init__(self, whois, debug_enabled=False, silent=False):
         super().__init__(debug_enabled=debug_enabled, silent=silent)
         self.whois = whois
+        self.groups = []
         self.__query_type__ = None
         self.__query__ = None
         self.__stdout__ = None
         self.__stderr__ = None
         self.__loaded__ = None
+
+    def __get_group_loader_class__(self, line):
+        """
+        Get loader class for specified section group type
+        """
+        field, value = parse_field_value(line)
+        is_label = not value
+        if field is None:
+            return None, is_label
+        for loader in self.__group_loaders__:
+            if field in loader.__groups__:
+                return loader, is_label
+        self.debug(f'unmapped group {field}')
+        return self.__fallback_group_loader__, is_label
+
+    def __create_group__(self, line):
+        """
+        Create group from output line
+        """
+        loader, is_label = self.__get_group_loader_class__(line)
+        if loader is None:
+            return None, is_label
+        try:
+            group = loader(self, line)
+        except WhoisQueryError as error:
+            self.debug(error)
+            return None, is_label
+        self.groups.append(group)
+        return group, is_label
+
+    def __stdout_item_iterator__(self):
+        """
+        Parse whois query data as iterator
+
+        Triggers query if self.__stdout__ or self.__stderr__ is undefined
+        """
+        group = None
+        is_label = False
+        for line in self.__stdout__:
+            comment = line[:1] in COMMENT_MARKERS
+            if comment or line.strip() == '':
+                has_data = group is not None and not group.is_empty
+                if not is_label or is_label and has_data:
+                    group = None
+            elif group is None:
+                group, is_label = self.__create_group__(line)
+                if group is not None:
+                    yield group
+
+            if group is not None:
+                group.parse_line(line)
+
+    def __load_data__(self, stdout, stderr, query_type=None, loaded_timestamp=None):
+        """
+        Load data from pwhois query response
+        """
+        self.__stdout__ = stdout
+        self.__stderr__ = stderr
+        self.__query_type__ = query_type
         self.groups = []
+
+        list(self.__stdout_item_iterator__())
+        for group in self.groups:
+            group.finalize()
+        if loaded_timestamp is not None:
+            self.__loaded__ = loaded_timestamp
+        else:
+            self.__loaded__ = datetime.now().timestamp()
+
+
+class PWhoisQueryResponse(BaseQueryResponse):
+    """
+    Query response from whois.pwhois.org server (prefix whois data)
+    """
+    def __init__(self, whois, debug_enabled=False, silent=False):
+        super().__init__(whois, debug_enabled=debug_enabled, silent=silent)
+        self.__query_type__ = 'prefix'
+
+    def query(self, query):
+        """
+        Query pwhois cache for response
+        """
+        try:
+            stdout, stderr = run_command_lineoutput(
+                *('whois', str(query)),
+                encodings=LINE_ENCODINGS,
+                timeout=QUERY_TIMEOUT
+            )
+            self.__query__ = query
+            self.__load_data__(stdout, stderr, query_type=self.__query_type__)
+        except CommandError as error:
+            raise WhoisQueryError(error) from error
+
+
+class WhoisQueryResponse(BaseQueryResponse):
+    """
+    Query whois servers and parse data from responses
+    """
+    __group_loaders__ = GROUP_LOADERS
+    __fallback_group_loader__ = InformationSectionGroup
+
+    def __init__(self, whois, debug_enabled=False, silent=False):
+        super().__init__(whois, debug_enabled=debug_enabled, silent=silent)
+        self.__query_type__ = None
         self.address_ranges = []
         self.networks = []
 
@@ -85,58 +189,6 @@ class WhoisQueryResponse(Base):
                 return organization
         return ''
 
-    def __get_group_loader_class__(self, line):
-        """
-        Get loader class for specified section group type
-        """
-        field, value = parse_field_value(line)
-        is_label = not value
-        if field is None:
-            return None, is_label
-        for loader in self.__group_loaders__:
-            if field in loader.__groups__:
-                return loader, is_label
-        self.debug(f'unmapped group {field}')
-        return self.__fallback_group_loader__, is_label
-
-    def __create_group__(self, line):
-        """
-        Create group
-        """
-        loader, is_label = self.__get_group_loader_class__(line)
-        if loader is None:
-            return None, is_label
-        try:
-            group = loader(self, line)
-        except WhoisQueryError as error:
-            self.debug(error)
-            return None, is_label
-        self.groups.append(group)
-        return group, is_label
-
-    def __stdout_item_iterator__(self):
-        """
-        Parse whois query data as iterator
-
-        Triggers query if self.__stdout__ or self.__stderr__ is undefined
-        """
-
-        group = None
-        is_label = False
-        for line in self.__stdout__:
-            comment = line[:1] in COMMENT_MARKERS
-            if comment or line.strip() == '':
-                has_data = group is not None and not group.is_empty
-                if not is_label or is_label and has_data:
-                    group = None
-            elif group is None:
-                group, is_label = self.__create_group__(line)
-                if group is not None:
-                    yield group
-
-            if group is not None:
-                group.parse_line(line)
-
     def __detect_networks__(self):
         """
         Detect network ranges and networks in groups
@@ -158,7 +210,7 @@ class WhoisQueryResponse(Base):
     @staticmethod
     def __detect_query_type__(query):
         """
-        Detect query type
+        Detect query type from query details
         """
         try:
             IPAddress(query)
@@ -176,19 +228,8 @@ class WhoisQueryResponse(Base):
         """
         Load data from response
         """
-        self.__stdout__ = stdout
-        self.__stderr__ = stderr
-        self.__query_type__ = query_type
-        self.groups = []
-        list(self.__stdout_item_iterator__())
-        for group in self.groups:
-            group.finalize()
+        super().__load_data__(stdout, stderr, query_type, loaded_timestamp)
         self.__detect_networks__()
-        if loaded_timestamp is not None:
-            self.__loaded__ = loaded_timestamp
-        else:
-            self.__loaded__ = datetime.now().timestamp()
-
         if self.__query_type__ is None:
             self.__query_type__ = 'address' if self.address_ranges else 'domain'
 
@@ -209,8 +250,8 @@ class WhoisQueryResponse(Base):
             )
             self.__query__ = query
             self.__load_data__(stdout, stderr, query_type=query_type)
-        except ScriptError as error:
-            raise WhoisQueryError(error)
+        except CommandError as error:
+            raise WhoisQueryError(error) from error
 
     def match(self, query):
         """

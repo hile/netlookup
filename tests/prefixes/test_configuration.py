@@ -1,6 +1,8 @@
+"""
+Unit tests for netloookup.network_sets.configuration settings
+"""
 
 from pathlib import Path
-from unittest.mock import patch
 
 from netlookup.network_sets.base import NetworkSet
 from netlookup.prefixes import Prefixes
@@ -29,19 +31,19 @@ def test_prefixes_configuration_default_cache_directory():
     assert prefixes.cache_directory == get_cache_directory()
 
 
-def test_prefixes_configuration_darwin_cache_directory():
+def test_prefixes_configuration_darwin_cache_directory(monkeypatch):
     """
     Test cache directory attribute for darwin platform
     """
-    with patch('sys.platform', 'darwin'):
-        prefixes = Prefixes()
-        assert prefixes.cache_directory == DARWIN_CACHE_DIRECTORY
+    monkeypatch.setattr('sys.platform', 'darwin')
+    prefixes = Prefixes()
+    assert prefixes.cache_directory == DARWIN_CACHE_DIRECTORY
 
 
-def test_prefixes_configuration_linux_cache_directory():
+def test_prefixes_configuration_linux_cache_directory(monkeypatch):
     """
     Test cache directory attribute for linux platform
     """
-    with patch('sys.platform', 'linux'):
-        prefixes = Prefixes()
-        assert prefixes.cache_directory == DEFAULT_CACHE_DIRECTORY
+    monkeypatch.setattr('sys.platform', 'linux')
+    prefixes = Prefixes()
+    assert prefixes.cache_directory == DEFAULT_CACHE_DIRECTORY

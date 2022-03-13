@@ -54,10 +54,10 @@ class AWS(NetworkSet):
         try:
             res = requests.get(AWS_IP_RANGES_URL)
             if res.status_code != 200:
-                raise ValueError(f'HTTP status code {res.status_code}')
+                raise NetworkError(f'HTTP status code {res.status_code}')
             return res.content
         except Exception as error:
-            raise NetworkError(f'Error fetching AWS IP ranges: {error}')
+            raise NetworkError(f'Error fetching AWS IP ranges: {error}') from error
 
     def fetch(self):
         """
@@ -67,7 +67,7 @@ class AWS(NetworkSet):
         try:
             data = json.loads(self.__get_aws_ip_ranges__())
         except Exception as error:
-            raise NetworkError(f'Error loading AWS IP range data: {error}')
+            raise NetworkError(f'Error loading AWS IP range data: {error}') from error
 
         self.updated = datetime.fromtimestamp(int(data['syncToken']))
         networks = {}

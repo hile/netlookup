@@ -14,6 +14,6 @@ def mock_whois_cache_path(monkeypatch, tmpdir):
     """
     print('mock whois lookup cache file')
     monkeypatch.setattr(
-        'netlookup.whois.lookup.DEFAULT_CACHE_FILE',
+        'netlookup.whois.lookup.WHOIS_CACHE_FILE',
         Path(tmpdir, 'whois.json')
     )

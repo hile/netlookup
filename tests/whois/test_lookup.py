@@ -17,10 +17,13 @@ def test_whois_lookup_properties():
     assert whois.__debug_enabled__ is False
     assert whois.__silent__ is False
     assert len(whois.__responses__) == 0
+    # pylint: disable=use-implicit-booleaness-not-comparison
     assert whois.__dns_lookup_table__ == {}
+    # pylint: disable=use-implicit-booleaness-not-comparison
     assert whois.__unmapped_fields__ == {}
 
     assert whois.match('1.2.3.4') is None
+    # pylint: disable=use-implicit-booleaness-not-comparison
     assert whois.filter_keys('test_key') == []
 
 
@@ -28,10 +31,7 @@ def test_whois_cache_load(monkeypatch):
     """
     Test loading cache from test data file
     """
-    monkeypatch.setattr(
-        'netlookup.whois.lookup.DEFAULT_CACHE_FILE',
-        TEST_CACHE
-    )
+    monkeypatch.setattr('netlookup.whois.lookup.WhoisAddressLookup.__default_cache_file__', TEST_CACHE)
     whois = WhoisAddressLookup()
     assert len(whois.__responses__) == TEST_CACHE_SIZE
     response = whois.match('0.0.0.0')

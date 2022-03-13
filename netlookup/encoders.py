@@ -4,7 +4,7 @@ Data format encoders
 
 from netaddr.ip import IPAddress, IPNetwork, IPRange
 
-from cli_toolkit.encoders import DateTimeEncoder
+from sys_toolkit.encoders import DateTimeEncoder
 
 
 class NetworkDataEncoder(DateTimeEncoder):
@@ -16,11 +16,10 @@ class NetworkDataEncoder(DateTimeEncoder):
     - network routes
     """
 
-    # pylint: disable=arguments-differ,method-hidden
-    def default(self, obj):
+    def default(self, o):
         """
         Encode network objects as strings
         """
-        if isinstance(obj, (IPAddress, IPNetwork, IPRange)):
-            return str(obj)
-        return super().default(obj)
+        if isinstance(o, (IPAddress, IPNetwork, IPRange)):
+            return str(o)
+        return super().default(o)

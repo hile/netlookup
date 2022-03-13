@@ -58,10 +58,10 @@ class Azure(NetworkSet):
                 headers={'Content-Type': 'application/json'}
             )
             if res.status_code != 200:
-                raise ValueError(f'HTTP status code {res.status_code}')
+                raise NetworkError(f'HTTP status code {res.status_code}')
             return res.content
         except Exception as error:
-            raise NetworkError(f'Error fetching azure IP ranges: {error}')
+            raise NetworkError(f'Error fetching azure IP ranges: {error}') from error
 
     def fetch(self):
         """
@@ -70,7 +70,7 @@ class Azure(NetworkSet):
         try:
             data = json.loads(self.__get_azure_ip_ranges__())
         except Exception as error:
-            raise NetworkError(f'Error loading azure IP range data: {error}')
+            raise NetworkError(f'Error loading azure IP range data: {error}') from error
 
         self.__networks__.clear()
         for region in data:
@@ -91,7 +91,7 @@ class Azure(NetworkSet):
                 except Exception as error:
                     raise NetworkError(
                         f'Error parsing region {region} prefix "{data.get(region, [])}": {error}'
-                    )
+                    ) from error
 
         self.updated = datetime.now()
         self.__networks__.sort(key=attrgetter('region'))

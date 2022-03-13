@@ -36,7 +36,9 @@ def test_whois_response_properties():
     assert response.match(TEST_DOMAIN) is None
 
     response.__detect_networks__()
+    # pylint: disable=use-implicit-booleaness-not-comparison
     assert response.networks == []
+    # pylint: disable=use-implicit-booleaness-not-comparison
     assert response.address_ranges == []
 
 

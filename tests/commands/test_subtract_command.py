@@ -1,42 +1,35 @@
-import sys
-
-from unittest.mock import patch
+"""
+Unit tests for CLI command 'netlookup substract'
+"""
 
 import pytest
 
 from netlookup.bin.netlookup import main
 
 
-@patch.object(sys.stderr, 'write')
-def test_commands_subtract_no_args(mock_method):
+def test_commands_subtract_no_args(monkeypatch):
     """
     Test initializing subtract command
     """
     test_args = ['netlookup', 'subtract']
-    with patch.object(sys, 'argv', test_args):
-        with pytest.raises(SystemExit) as exit_code:
-            main()
-        assert exit_code.type == SystemExit
-        assert exit_code.value.code == 2
-    assert mock_method.called
+    monkeypatch.setattr('sys.argv', test_args)
+    with pytest.raises(SystemExit) as exit_status:
+        main()
+    assert exit_status.value.code == 2
 
 
-@patch.object(sys.stderr, 'write')
-def test_commands_subtract_substracted_no_subnets(mock_method):
+def test_commands_subtract_substracted_no_subnets(monkeypatch):
     """
     Test initializing subtract command
     """
     test_args = ['netlookup', 'subtract', '-n', '192.168.0.0/33']
-    with patch.object(sys, 'argv', test_args):
-        with pytest.raises(SystemExit) as exit_code:
-            main()
-        assert exit_code.type == SystemExit
-        assert exit_code.value.code == 1
-    assert mock_method.called
+    monkeypatch.setattr('sys.argv', test_args)
+    with pytest.raises(SystemExit) as exit_status:
+        main()
+    assert exit_status.value.code == 1
 
 
-@patch.object(sys.stderr, 'write')
-def test_commands_subtract_invalid_subnets(mock_method):
+def test_commands_subtract_invalid_subnets(monkeypatch):
     """
     Test initializing subtract command
     """
@@ -45,16 +38,13 @@ def test_commands_subtract_invalid_subnets(mock_method):
         '-n', '192.168.0.0/29',
         '192.168.0.0/33'
     ]
-    with patch.object(sys, 'argv', test_args):
-        with pytest.raises(SystemExit) as exit_code:
-            main()
-        assert exit_code.type == SystemExit
-        assert exit_code.value.code == 1
-    assert mock_method.called
+    monkeypatch.setattr('sys.argv', test_args)
+    with pytest.raises(SystemExit) as exit_status:
+        main()
+    assert exit_status.value.code == 1
 
 
-@patch.object(sys.stderr, 'write')
-def test_commands_subtract_invalid_substracted_subnets(mock_method):
+def test_commands_subtract_invalid_substracted_subnets(monkeypatch):
     """
     Test initializing subtract command
     """
@@ -63,16 +53,13 @@ def test_commands_subtract_invalid_substracted_subnets(mock_method):
         '-n', '192.168.0.0/33',
         '192.168.0.0/24'
     ]
-    with patch.object(sys, 'argv', test_args):
-        with pytest.raises(SystemExit) as exit_code:
-            main()
-        assert exit_code.type == SystemExit
-        assert exit_code.value.code == 1
-    assert mock_method.called
+    monkeypatch.setattr('sys.argv', test_args)
+    with pytest.raises(SystemExit) as exit_status:
+        main()
+    assert exit_status.value.code == 1
 
 
-@patch.object(sys.stdout, 'write')
-def test_commands_subtract_valid_substracted_subnets(mock_method):
+def test_commands_subtract_valid_substracted_subnets(monkeypatch):
     """
     Test initializing subtract command
     """
@@ -81,6 +68,7 @@ def test_commands_subtract_valid_substracted_subnets(mock_method):
         '-n', '192.168.0.0/29,192.168.1.0/29',
         '192.168.0.0/24', '10.0.0.0/8'
     ]
-    with patch.object(sys, 'argv', test_args):
+    monkeypatch.setattr('sys.argv', test_args)
+    with pytest.raises(SystemExit) as exit_status:
         main()
-    assert mock_method.called
+    assert exit_status.value.code == 0

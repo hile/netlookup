@@ -121,7 +121,7 @@ def test_network_set_find_valid_addresses():
     network_set = NetworkSet(networks=VALID_SUBNET_VALUES)
     for value in VALID_ADDRESS_LOOKUPS:
         address = network_set.find(value)
-        assert address is not None, 'error looking up {}'.format(value)
+        assert address is not None, f'error looking up {value}'
         print(address)
 
     address = network_set.find('127.0.0.1')

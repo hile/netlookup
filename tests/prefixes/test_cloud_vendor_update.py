@@ -1,7 +1,9 @@
+"""
+Unnit tests for netlookup.prefixes cloud address pool parsing
+"""
 
 import json
 import tempfile
-from unittest.mock import patch
 
 import pytest
 
@@ -64,7 +66,7 @@ def test_cloud_vendor_networks_updating():
         assert len(vendor) > 0
 
 
-def test_cloud_vendor_aws_fetch_error():
+def test_cloud_vendor_aws_fetch_error(monkeypatch):
     """
     Test failure fetching AWS data with HTTP
     """
@@ -72,12 +74,12 @@ def test_cloud_vendor_aws_fetch_error():
     prefixes = Prefixes(cache_directory=tempdir)
     vendor = prefixes.get_vendor('aws')
 
-    with patch('netlookup.network_sets.aws.AWS_IP_RANGES_URL', INVALID_URL):
-        with pytest.raises(NetworkError):
-            vendor.fetch()
+    monkeypatch.setattr('netlookup.network_sets.aws.AWS_IP_RANGES_URL', INVALID_URL)
+    with pytest.raises(NetworkError):
+        vendor.fetch()
 
 
-def test_cloud_vendor_aws_data_parse_error():
+def test_cloud_vendor_aws_data_parse_error(monkeypatch):
     """
     Test failure updating AWS data
     """
@@ -85,12 +87,12 @@ def test_cloud_vendor_aws_data_parse_error():
     prefixes = Prefixes(cache_directory=tempdir)
     vendor = prefixes.get_vendor('aws')
 
-    with patch.object(vendor, '__get_aws_ip_ranges__', mock_invalid_json_data):
-        with pytest.raises(NetworkError):
-            vendor.fetch()
+    monkeypatch.setattr(vendor, '__get_aws_ip_ranges__', mock_invalid_json_data)
+    with pytest.raises(NetworkError):
+        vendor.fetch()
 
 
-def test_cloud_vendor_azure_fetch_error():
+def test_cloud_vendor_azure_fetch_error(monkeypatch):
     """
     Test failure fetching Azure data with HTTP
     """
@@ -98,12 +100,12 @@ def test_cloud_vendor_azure_fetch_error():
     prefixes = Prefixes(cache_directory=tempdir)
     vendor = prefixes.get_vendor('azure')
 
-    with patch('netlookup.network_sets.azure.AZURE_SERVICES_URL', INVALID_URL):
-        with pytest.raises(NetworkError):
-            vendor.fetch()
+    monkeypatch.setattr('netlookup.network_sets.azure.AZURE_SERVICES_URL', INVALID_URL)
+    with pytest.raises(NetworkError):
+        vendor.fetch()
 
 
-def test_cloud_vendor_azure_data_parse_error():
+def test_cloud_vendor_azure_data_parse_error(monkeypatch):
     """
     Test failure updating Azure data
     """
@@ -111,12 +113,12 @@ def test_cloud_vendor_azure_data_parse_error():
     prefixes = Prefixes(cache_directory=tempdir)
     vendor = prefixes.get_vendor('azure')
 
-    with patch.object(vendor, '__get_azure_ip_ranges__', mock_invalid_json_data):
-        with pytest.raises(NetworkError):
-            vendor.fetch()
+    monkeypatch.setattr(vendor, '__get_azure_ip_ranges__', mock_invalid_json_data)
+    with pytest.raises(NetworkError):
+        vendor.fetch()
 
 
-def test_cloud_vendor_azure_data_empty_region():
+def test_cloud_vendor_azure_data_empty_region(monkeypatch):
     """
     Test updating Azure data with empty region item
     """
@@ -124,12 +126,12 @@ def test_cloud_vendor_azure_data_empty_region():
     prefixes = Prefixes(cache_directory=tempdir)
     vendor = prefixes.get_vendor('azure')
 
-    with patch.object(vendor, '__get_azure_ip_ranges__', mock_azure_empty_region_data):
-        vendor.fetch()
-        assert len(vendor) == 0
+    monkeypatch.setattr(vendor, '__get_azure_ip_ranges__', mock_azure_empty_region_data)
+    vendor.fetch()
+    assert len(vendor) == 0
 
 
-def test_cloud_vendor_azure_data_string_prefix_region():
+def test_cloud_vendor_azure_data_string_prefix_region(monkeypatch):
     """
     Test updating Azure data with string preffix region item
     """
@@ -137,12 +139,12 @@ def test_cloud_vendor_azure_data_string_prefix_region():
     prefixes = Prefixes(cache_directory=tempdir)
     vendor = prefixes.get_vendor('azure')
 
-    with patch.object(vendor, '__get_azure_ip_ranges__', mock_azure_region_string_data):
-        vendor.fetch()
-        assert len(vendor) == 1
+    monkeypatch.setattr(vendor, '__get_azure_ip_ranges__', mock_azure_region_string_data)
+    vendor.fetch()
+    assert len(vendor) == 1
 
 
-def test_cloud_vendor_azure_data_invalid_prefix_region():
+def test_cloud_vendor_azure_data_invalid_prefix_region(monkeypatch):
     """
     Test updating Azure data with string preffix region item
     """
@@ -150,7 +152,7 @@ def test_cloud_vendor_azure_data_invalid_prefix_region():
     prefixes = Prefixes(cache_directory=tempdir)
     vendor = prefixes.get_vendor('azure')
 
-    with patch.object(vendor, '__get_azure_ip_ranges__', mock_azure_region_invalid_prefix_data):
-        with pytest.raises(NetworkError):
-            vendor.fetch()
-        assert len(vendor) == 0
+    monkeypatch.setattr(vendor, '__get_azure_ip_ranges__', mock_azure_region_invalid_prefix_data)
+    with pytest.raises(NetworkError):
+        vendor.fetch()
+    assert len(vendor) == 0

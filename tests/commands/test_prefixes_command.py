@@ -1,6 +1,6 @@
-import sys
-
-from unittest.mock import patch
+"""
+Unit tests for CLI command 'netlookup prefixes'
+"""
 
 import pytest
 
@@ -15,72 +15,56 @@ def mock_fail_vendor_update():
     raise NetworkError('Mock failed update')
 
 
-@patch.object(sys.stderr, 'write')
-def test_commands_prefixes_no_args(mock_method):
+def test_commands_prefixes_no_args(monkeypatch):
     """
     Test initializing prefixes command
     """
     test_args = ['netlookup', 'prefixes']
-    with patch.object(sys, 'argv', test_args):
-        with pytest.raises(SystemExit) as exit_code:
-            main()
-        assert exit_code.type == SystemExit
-        assert exit_code.value.code == 1
-    assert mock_method.called
-
-
-def test_commands_prefixes_update_cache():
-    """
-    Test updating prefixes cache
-    """
-    test_args = ['netlookup', 'prefixes', '--update']
-    with patch.object(sys, 'argv', test_args):
+    monkeypatch.setattr('sys.argv', test_args)
+    with pytest.raises(SystemExit) as exit_status:
         main()
+    assert exit_status.value.code == 1
 
 
-@patch.object(sys.stderr, 'write')
-def test_commands_prefixes_update_cache_fail(mock_method):
+def test_commands_prefixes_update_cache(monkeypatch):
     """
     Test updating prefixes cache
     """
     test_args = ['netlookup', 'prefixes', '--update']
-    with patch('netlookup.prefixes.AWS.fetch', mock_fail_vendor_update):
-        with patch.object(sys, 'argv', test_args):
-            with pytest.raises(SystemExit) as exit_code:
-                main()
-            assert exit_code.type == SystemExit
-            assert exit_code.value.code == 1
-    assert mock_method.called
+    monkeypatch.setattr('sys.argv', test_args)
+    with pytest.raises(SystemExit) as exit_status:
+        main()
+    assert exit_status.value.code == 0
 
 
-@patch.object(sys.stdout, 'write')
-def test_commands_prefixes_lookup_known_address(mock_method):
+def test_commands_prefixes_lookup_known_address(monkeypatch):
     """
     Test lookup for address in prefixes cache
     """
     test_args = ['netlookup', 'prefixes', '8.34.223.255']
-    with patch.object(sys, 'argv', test_args):
+    monkeypatch.setattr('sys.argv', test_args)
+    with pytest.raises(SystemExit) as exit_status:
         main()
-    assert mock_method.called
+    assert exit_status.value.code == 0
 
 
-@patch.object(sys.stdout, 'write')
-def test_commands_prefixes_lookup_internal_address(mock_method):
+def test_commands_prefixes_lookup_internal_address(monkeypatch):
     """
     Test lookup for address not in prefixes cache
     """
     test_args = ['netlookup', 'prefixes', '192.168.0.1']
-    with patch.object(sys, 'argv', test_args):
+    monkeypatch.setattr('sys.argv', test_args)
+    with pytest.raises(SystemExit) as exit_status:
         main()
-    assert not mock_method.called
+    assert exit_status.value.code == 0
 
 
-@patch.object(sys.stderr, 'write')
-def test_commands_prefixes_lookup_invalid_address(mock_method):
+def test_commands_prefixes_lookup_invalid_address(monkeypatch):
     """
     Test lookup for invalid address
     """
     test_args = ['netlookup', 'prefixes', 'foobar']
-    with patch.object(sys, 'argv', test_args):
+    monkeypatch.setattr('sys.argv', test_args)
+    with pytest.raises(SystemExit) as exit_status:
         main()
-    assert mock_method.called
+    assert exit_status.value.code == 0
