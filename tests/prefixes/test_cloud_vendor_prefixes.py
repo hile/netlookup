@@ -11,7 +11,6 @@ from netlookup.network_sets import base
 from netlookup.network import NetworkError
 from netlookup.prefixes import Prefixes
 from netlookup.network_sets.aws import AWS, AWSPrefix
-from netlookup.network_sets.azure import Azure, AzurePrefix
 from netlookup.network_sets.gcp import GCP, GCPPrefix
 from netlookup.network_sets.google import GoogleServices, GoogleServicePrefix
 
@@ -19,7 +18,7 @@ from ..constants import MATCH_PREFIXES_LOOKUPS, INVALID_ADDRESS_LOOKUPS
 
 DATA_PATH = Path(__file__).parent.absolute().joinpath('data')
 
-TEST_DATA_PREFIX_LEN = 4085
+TEST_DATA_PREFIX_LEN = 1511
 TEST_NETWORK_ADDRESSES = (
     {
         'address': '8.34.208.0',
@@ -64,7 +63,6 @@ TEST_JSON_REQUIRED_FIELDS = ('type', 'cidr')
 TEST_FILTER_COUNTS = {
     'invalidvalue': 0,
     'aws': 1414,
-    'azure': 2574,
     'gcp': 72,
     'google': 25,
 }
@@ -265,16 +263,6 @@ def test_cloud_vendor_prefixes_aws():
     assert isinstance(regions, list)
     for region in regions:
         assert isinstance(region, str)
-
-
-def test_cloud_vendor_prefixes_azure():
-    """
-    Test cases for Azure prefixes
-    """
-    prefixes = Prefixes(cache_directory=DATA_PATH)
-    vendor = prefixes.get_vendor('azure')
-    assert isinstance(vendor, Azure)
-    validate_prefix_list(vendor, AzurePrefix)
 
 
 def test_cloud_vendor_prefixes_gcp():

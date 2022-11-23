@@ -5,7 +5,6 @@ from pathlib import Path
 from .network import NetworkList, NetworkError, find_address_in_networks
 from .network_sets.configuration import get_cache_directory
 from .network_sets.aws import AWS
-from .network_sets.azure import Azure
 from .network_sets.gcp import GCP
 from .network_sets.google import GoogleServices
 
@@ -22,7 +21,6 @@ class Prefixes(NetworkList):
 
         self.vendors = [
             AWS(cache_directory=self.cache_directory),
-            Azure(cache_directory=self.cache_directory),
             GCP(cache_directory=self.cache_directory),
             GoogleServices(cache_directory=self.cache_directory),
         ]

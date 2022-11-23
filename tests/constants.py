@@ -26,7 +26,6 @@ MAX_SPLITS = 8
 # Values for address lookups that match prefixes in test data
 MATCH_PREFIXES_LOOKUPS = (
     '107.167.164.19',
-    '40.77.160.142',
     '2600:1900::abba:dead:beef',
 )
 

@@ -9,6 +9,7 @@ import requests
 from ..network import NetworkError
 from .base import NetworkSet, NetworkSetItem
 
+AWS_REQUEST_TIMEOUT = 30
 AWS_IP_RANGES_URL = 'https://ip-ranges.amazonaws.com/ip-ranges.json'
 SKIP_SERVICE_NAMES = (
     'AMAZON',
@@ -52,7 +53,7 @@ class AWS(NetworkSet):
         Fetch AWS IP ranges
         """
         try:
-            res = requests.get(AWS_IP_RANGES_URL)
+            res = requests.get(AWS_IP_RANGES_URL, timeout=AWS_REQUEST_TIMEOUT)
             if res.status_code != 200:
                 raise NetworkError(f'HTTP status code {res.status_code}')
             return res.content
