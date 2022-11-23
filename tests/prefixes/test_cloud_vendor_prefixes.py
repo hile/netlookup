@@ -14,9 +14,11 @@ from netlookup.network_sets.aws import AWS, AWSPrefix
 from netlookup.network_sets.gcp import GCP, GCPPrefix
 from netlookup.network_sets.google import GoogleServices, GoogleServicePrefix
 
-from ..constants import MATCH_PREFIXES_LOOKUPS, INVALID_ADDRESS_LOOKUPS
-
-DATA_PATH = Path(__file__).parent.absolute().joinpath('data')
+from ..conftest import (
+    INVALID_ADDRESS_LOOKUPS,
+    MATCH_PREFIXES_LOOKUPS,
+    MOCK_PREFIX_CACHE_PATH,
+)
 
 TEST_DATA_PREFIX_LEN = 1511
 TEST_NETWORK_ADDRESSES = (
@@ -179,7 +181,7 @@ def test_cloud_vendor_networks_loading():
     """
     Test creating networks with test data, ensuring correct number of networks is loaded
     """
-    prefixes = Prefixes(cache_directory=DATA_PATH)
+    prefixes = Prefixes(cache_directory=MOCK_PREFIX_CACHE_PATH)
     assert len(prefixes) == TEST_DATA_PREFIX_LEN
 
 
@@ -187,7 +189,7 @@ def test_cloud_vendor_prefix_filtering():
     """
     Test filtering cloud vendor prefixes
     """
-    prefixes = Prefixes(cache_directory=DATA_PATH)
+    prefixes = Prefixes(cache_directory=MOCK_PREFIX_CACHE_PATH)
     for name, count in TEST_FILTER_COUNTS.items():
         matches = prefixes.filter_type(name)
         assert len(matches) == count
@@ -197,7 +199,7 @@ def test_cloud_vendor_prefix_find_valid_addresses():
     """
     Test finding of addresses from cloud vendor prefixes
     """
-    prefixes = Prefixes(cache_directory=DATA_PATH)
+    prefixes = Prefixes(cache_directory=MOCK_PREFIX_CACHE_PATH)
     for value in MATCH_PREFIXES_LOOKUPS:
         address = prefixes.find(value)
         assert address is not None
@@ -207,7 +209,7 @@ def test_cloud_vendor_prefix_find_invalid_addresses():
     """
     Test finding of invalid address values from cloud vendor prefixes
     """
-    prefixes = Prefixes(cache_directory=DATA_PATH)
+    prefixes = Prefixes(cache_directory=MOCK_PREFIX_CACHE_PATH)
 
     for value in INVALID_ADDRESS_LOOKUPS:
         with pytest.raises(NetworkError):
@@ -218,7 +220,7 @@ def test_cloud_vendor_prefix_lookup():
     """
     Test looking up networks from test data
     """
-    prefixes = Prefixes(cache_directory=DATA_PATH)
+    prefixes = Prefixes(cache_directory=MOCK_PREFIX_CACHE_PATH)
     for testcase in TEST_NETWORK_ADDRESSES:
         prefix = prefixes.find(testcase['address'])
         network = testcase.get('network', None)
@@ -233,7 +235,7 @@ def test_cloud_vendor_json_formatting():
     """
     Test all loaded networks can be formatted as JSON
     """
-    prefixes = Prefixes(cache_directory=DATA_PATH)
+    prefixes = Prefixes(cache_directory=MOCK_PREFIX_CACHE_PATH)
     for prefix in prefixes:
         testdata = json.loads(json.dumps(prefix.as_dict()))
         for field in TEST_JSON_REQUIRED_FIELDS:
@@ -245,7 +247,7 @@ def test_cloud_vendor_prefixes_invalid_vendor():
     """
     Test cases for AWS prefixes
     """
-    prefixes = Prefixes(cache_directory=DATA_PATH)
+    prefixes = Prefixes(cache_directory=MOCK_PREFIX_CACHE_PATH)
     with pytest.raises(NetworkError):
         prefixes.get_vendor('8522A483-A895-40F3-B5BE-93DDDCA58E51')
 
@@ -254,7 +256,7 @@ def test_cloud_vendor_prefixes_aws():
     """
     Test cases for AWS prefixes
     """
-    prefixes = Prefixes(cache_directory=DATA_PATH)
+    prefixes = Prefixes(cache_directory=MOCK_PREFIX_CACHE_PATH)
     vendor = prefixes.get_vendor('aws')
     assert isinstance(vendor, AWS)
     validate_prefix_list(vendor, AWSPrefix)
@@ -269,7 +271,7 @@ def test_cloud_vendor_prefixes_gcp():
     """
     Test cases for GCP prefixes
     """
-    prefixes = Prefixes(cache_directory=DATA_PATH)
+    prefixes = Prefixes(cache_directory=MOCK_PREFIX_CACHE_PATH)
     vendor = prefixes.get_vendor('gcp')
     assert isinstance(vendor, GCP)
     validate_prefix_list(vendor, GCPPrefix)
@@ -279,7 +281,7 @@ def test_cloud_vendor_prefixes_google_services():
     """
     Test cases for google services prefixes
     """
-    prefixes = Prefixes(cache_directory=DATA_PATH)
+    prefixes = Prefixes(cache_directory=MOCK_PREFIX_CACHE_PATH)
     vendor = prefixes.get_vendor('google')
     assert isinstance(vendor, GoogleServices)
     validate_prefix_list(vendor, GoogleServicePrefix)

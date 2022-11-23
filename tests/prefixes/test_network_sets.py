@@ -1,6 +1,4 @@
 
-from pathlib import Path
-
 import pytest
 
 from netlookup.network import Network, NetworkError
@@ -9,29 +7,15 @@ from netlookup.network_sets.base import (
     NetworkSetItem,
 )
 
-from ..constants import (
-    VALID_SUBNET_VALUES,
+from ..conftest import (
+    INVALID_ADDRESS_LOOKUPS,
+    INVALID_JSON_CACHE_FILE,
+    INVALID_NETWORK_SET_CACHE_FILE,
     INVALID_SUBNET_VALUES,
     MAX_SPLITS,
+    SUBSTRACT_CACHE_FILE,
     VALID_ADDRESS_LOOKUPS,
-    INVALID_ADDRESS_LOOKUPS
-)
-
-
-INVALID_JSON_CACHE_FILE = Path(
-    Path(__file__).absolute().parent,
-    'data/invalid_json_data.json'
-)
-
-INVALID_NETWORK_SET_CACHE_FILE = Path(
-    Path(__file__).absolute().parent,
-    'data/invalid_network_set.json'
-)
-
-
-SUBSTRACT_CACHE_FILE = Path(
-    Path(__file__).absolute().parent,
-    'data/substract_networks.json'
+    VALID_SUBNET_VALUES,
 )
 
 

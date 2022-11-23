@@ -4,7 +4,7 @@ import pytest
 from netaddr.core import AddrFormatError
 
 from netlookup.network import Network
-from ..constants import VALID_SUBNET_VALUES, INVALID_SUBNET_VALUES, MAX_SPLITS
+from ..conftest import VALID_SUBNET_VALUES, INVALID_SUBNET_VALUES, MAX_SPLITS
 
 
 def validate_network(value):
