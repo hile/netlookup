@@ -385,7 +385,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
 name = "sys-toolkit"
-version = "2.2.4"
+version = "2.2.5"
 description = "Classes for operating system utilities"
 category = "main"
 optional = false
@@ -724,8 +724,8 @@ six = [
     {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
 ]
 sys-toolkit = [
-    {file = "sys-toolkit-2.2.4.tar.gz", hash = "sha256:6b414824543683387ed60526568a3f54fea876b313dccd0de324bf0858dcbf1c"},
-    {file = "sys_toolkit-2.2.4-py3-none-any.whl", hash = "sha256:ff3319cd8e05f3b5c9394933fcd017d0b3bc47818447f9909d220bb4075a4bea"},
+    {file = "sys_toolkit-2.2.5-py3-none-any.whl", hash = "sha256:5956e6631c8d59b40ae92646c7619272b214ce7dc1a176620dad13f1ed9493b4"},
+    {file = "sys_toolkit-2.2.5.tar.gz", hash = "sha256:e50fae2bf59137bc02670f03803f6036cea749f328ae9b0873df7dbeed1e7824"},
 ]
 tomli = [
     {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "netlookup"
-version = "1.2.0"
+version = "1.3.0"
 description = "Python tools to look up information about networks"
 authors = ["Ilkka Tuohela <hile@iki.fi>"]
 license = "PSF"
