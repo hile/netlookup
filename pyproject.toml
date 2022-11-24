@@ -11,6 +11,7 @@ cli_toolkit = "^2.2"
 dnspython = "^2.1"
 netaddr = "^0.8"
 requests = "^2.26"
+requests-mock = "^1.10.0"
 
 [tool.poetry.dev-dependencies]
 coverage = "^6.1"
