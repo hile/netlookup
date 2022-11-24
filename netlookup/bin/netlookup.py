@@ -7,7 +7,7 @@ from .commands.split import Split
 from .commands.substract import Subtract
 
 
-class NetLookup(Script):
+class NetLookupScript(Script):
     """
     Netlookup CLI command
     """
@@ -17,7 +17,7 @@ def main():
     """
     Main function for 'netlookup' CLI command
     """
-    script = NetLookup()
+    script = NetLookupScript()
 
     script.add_subcommand(Info(script))
     script.add_subcommand(PrefixLookup(script))
