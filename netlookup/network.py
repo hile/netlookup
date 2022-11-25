@@ -1,9 +1,11 @@
 
 from bisect import bisect_left
+from typing import Optional
 
 from netaddr.ip import IPNetwork, IPAddress
 from netaddr.core import AddrFormatError
 
+from .constants import IPV4_VERSION, IPV6_VERSION, MAX_PREFIX_LEN_IPV4, MAX_PREFIX_LEN_IPV6
 from .exceptions import NetworkError
 
 
@@ -50,18 +52,16 @@ def parse_address_or_network(value):
 
 class NetworkList(list):
     """
-    List of networks
+    Base class for a list of networks
     """
-
     def clear(self):
         del self[:len(self)]
 
 
 class Network(IPNetwork):
     """
-    Extend IPSubnet with some custom attributes
+    Extend IPNetwork with some custom attributes
     """
-
     def __eq__(self, other):
         if isinstance(other, str):
             other = parse_address_or_network(other)
@@ -104,15 +104,15 @@ class Network(IPNetwork):
         Return total number of available hosts in subnet, excluding network and
         broadcast addresses
         """
-        if self.version == 4:
-            if self.prefixlen == 31:
+        if self.version == IPV4_VERSION:
+            if self.prefixlen == MAX_PREFIX_LEN_IPV4 - 1:
                 return 2
-            if self.prefixlen == 32:
+            if self.prefixlen == MAX_PREFIX_LEN_IPV4:
                 return 1
         if self.version == 6:
-            if self.prefixlen == 127:
+            if self.prefixlen == MAX_PREFIX_LEN_IPV6 - 1:
                 return 2
-            if self.prefixlen == 128:
+            if self.prefixlen == MAX_PREFIX_LEN_IPV6:
                 return 1
         return self.size - 2
 
@@ -121,15 +121,15 @@ class Network(IPNetwork):
         """
         Return first available host in network, excluding network address
         """
-        if self.version == 4:
-            if self.prefixlen == 31:
+        if self.version == IPV4_VERSION:
+            if self.prefixlen == MAX_PREFIX_LEN_IPV4 - 1:
                 return IPAddress(self.first)
-            if self.prefixlen == 32:
+            if self.prefixlen == MAX_PREFIX_LEN_IPV4:
                 return None
-        if self.version == 6:
-            if self.prefixlen == 127:
+        if self.version == IPV6_VERSION:
+            if self.prefixlen == MAX_PREFIX_LEN_IPV6 - 1:
                 return IPAddress(self.first)
-            if self.prefixlen == 128:
+            if self.prefixlen == MAX_PREFIX_LEN_IPV6:
                 return None
         return IPAddress(self.first + 1)
 
@@ -138,15 +138,15 @@ class Network(IPNetwork):
         """
         Return last available host in network, excluding broadcast address
         """
-        if self.version == 4:
-            if self.prefixlen == 31:
+        if self.version == IPV4_VERSION:
+            if self.prefixlen == MAX_PREFIX_LEN_IPV4 - 1:
                 return IPAddress(self.last)
-            if self.prefixlen == 32:
+            if self.prefixlen == MAX_PREFIX_LEN_IPV4:
                 return None
-        if self.version == 6:
-            if self.prefixlen == 127:
+        if self.version == IPV6_VERSION:
+            if self.prefixlen == MAX_PREFIX_LEN_IPV6 - 1:
                 return IPAddress(self.last)
-            if self.prefixlen == 128:
+            if self.prefixlen == MAX_PREFIX_LEN_IPV6:
                 return None
         return IPAddress(self.last - 1)
 
@@ -157,11 +157,11 @@ class Network(IPNetwork):
 
         May return None when item is already a host only network
         """
-        if self.version == 4:
-            if self.prefixlen == 32:
+        if self.version == IPV4_VERSION:
+            if self.prefixlen == MAX_PREFIX_LEN_IPV4:
                 return None
-        if self.version == 6:
-            if self.prefixlen == 128:
+        if self.version == IPV6_VERSION:
+            if self.prefixlen == MAX_PREFIX_LEN_IPV6:
                 return None
         return self.prefixlen + 1
 
@@ -176,7 +176,14 @@ class Network(IPNetwork):
             return None
         return self.prefixlen - 1
 
-    def subnet(self, prefixlen, count=None, fmt=None):
+    @property
+    def max_prefix_len(self) -> int:
+        """
+        Return largets allowed prefix length
+        """
+        return MAX_PREFIX_LEN_IPV4 if self.version == 4 else MAX_PREFIX_LEN_IPV6
+
+    def subnet(self, prefixlen: int, count: Optional[int] = None, fmt: Optional[str] = None):
         """
         Return subnets split by specified prefix
 
@@ -184,17 +191,10 @@ class Network(IPNetwork):
         based on address type
         """
         prefixlen = int(prefixlen)
-        if self.version == 4:
-            if prefixlen < 0 or prefixlen > 32:
-                raise AddrFormatError('Invalid IPv4 prefix len')
-
-        if self.version == 6:
-            if prefixlen < 0 or prefixlen > 128:
-                raise AddrFormatError('Invalid IPv4 prefix len')
-
+        if prefixlen < 0 or prefixlen > self.max_prefix_len:
+            raise AddrFormatError(f'Invalid address prefixlen value: {prefixlen}')
         if prefixlen <= self.prefixlen:
             raise AddrFormatError(
                 f'Split mask {prefixlen} is not valid for prefixlen {self.prefixlen}'
             )
-
         return super().subnet(prefixlen, count, fmt)

@@ -20,9 +20,13 @@ class Protocol(FileItem):
     """
     __patterns__: List[re.Pattern] = PROTOCOL_LINE_PATTERNS
 
-    def __init__(self, name: str, number: int, aliases: str, comment: str = '') -> None:
+    def __init__(self,
+                 name: str,
+                 number: str,
+                 aliases: str = '',
+                 comment: str = '') -> None:
         self.name = name
-        self.number = number
+        self.number = int(number)
         self.aliases = aliases
         self.comment = comment.strip()
 

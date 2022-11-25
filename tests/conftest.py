@@ -5,10 +5,13 @@ from pathlib import Path
 
 import pytest
 
+from netlookup.network import Network
 from netlookup.prefixes import Prefixes
 
 from .constants import (
     INVALID_NETWORKS,
+    NETWORK_ENCODER_OUTPUT_TESTCASES,
+    NETWORK_HOST_COUNT_VALUES,
     NETWORK_FIRST_HOST_VALUES,
     NETWORK_LAST_HOST_VALUES,
     VALID_NETWORKS,
@@ -82,8 +85,16 @@ def mock_openbsd_files(monkeypatch):
     mock_environment_services(monkeypatch, 'openbsd')
 
 
+@pytest.fixture(params=NETWORK_ENCODER_OUTPUT_TESTCASES)
+def network_encoder_output(request):
+    """
+    Generate list of invalid networks
+    """
+    yield request.param
+
+
 @pytest.fixture(params=INVALID_NETWORKS)
-def mock_invalid_network(request):
+def invalid_network(request):
     """
     Generate list of invalid networks
     """
@@ -91,15 +102,31 @@ def mock_invalid_network(request):
 
 
 @pytest.fixture(params=VALID_NETWORKS)
-def mock_valid_network(request):
+def valid_network(request):
     """
     Generate list of valid networks
     """
     yield request.param
 
 
+@pytest.fixture
+def valid_network_list():
+    """
+    Return list of network objects
+    """
+    yield [Network(value) for value in VALID_NETWORKS]
+
+
+@pytest.fixture(params=NETWORK_HOST_COUNT_VALUES)
+def network_host_count_value(request):
+    """
+    Generate list of network, subnet host count values
+    """
+    yield request.param
+
+
 @pytest.fixture(params=NETWORK_FIRST_HOST_VALUES)
-def mock_network_first_host_tuple(request):
+def network_first_host_tuple(request):
     """
     Generate list of network, first host value tuples
     """
@@ -107,7 +134,7 @@ def mock_network_first_host_tuple(request):
 
 
 @pytest.fixture(params=NETWORK_LAST_HOST_VALUES)
-def mock_network_last_host_tuple(request):
+def network_last_host_tuple(request):
     """
     Generate list of network, last host value tuples
     """

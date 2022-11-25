@@ -4,10 +4,10 @@ Common base classes for network info text file parsers
 import re
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import Any, List
 
 
-def match_patterns(patterns, line) -> Optional[dict]:
+def match_patterns(patterns: List[re.Pattern], line: str) -> dict:
     """
     Parse fields in line with patterns
     """
@@ -44,13 +44,13 @@ class NetworkDataTextFile(Sequence):
     def __init__(self, path: str) -> None:
         self.__items__ = self.__load__(Path(path))
 
-    def __getitem__(self, key: str):
-        return self.__items__.__getitem__(key)
+    def __getitem__(self, index: int):
+        return self.__items__.__getitem__(index)
 
     def __iter__(self):
         return iter(self.__items__)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.__items__)
 
     def __load__(self, path: Path) -> List[Any]:

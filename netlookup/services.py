@@ -53,7 +53,7 @@ class Service(FileItem):
                  name: str = '',
                  aliases: str = '',
                  comment: str = '') -> None:
-        self.port_number = port_number
+        self.port_number = int(port_number)
         self.protocol = protocol
         self.name = name
         self.aliases = aliases.strip()
