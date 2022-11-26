@@ -268,7 +268,7 @@ class WhoisQueryResponse(BaseQueryResponse):
             return self.__query__ == query
         return None
 
-    def to_dict(self):
+    def as_dict(self):
         """
         Return data as dictionary
         """
@@ -282,7 +282,7 @@ class WhoisQueryResponse(BaseQueryResponse):
         """
         response = {}
         for group in self.groups:
-            for key, value in group.to_dict().items():
+            for key, value in group.as_dict().items():
                 if key not in response:
                     response[key] = value
                 elif not isinstance(response[key], list):

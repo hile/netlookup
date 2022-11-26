@@ -173,7 +173,7 @@ class InformationSectionGroup(dict):
             'description': self.__descriptions__.get(key, None),
         }
 
-    def to_dict(self):
+    def as_dict(self):
         """
         Return as dictionary
         """

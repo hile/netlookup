@@ -3,6 +3,7 @@ Utilities for whois lookups
 """
 
 from datetime import datetime
+from typing import List, Union
 import re
 
 import inflection
@@ -20,8 +21,11 @@ def parse_datetime(value):
     """
     Parse date value
     """
+    if not value:
+        raise WhoisQueryError('Invalid datetime value: value is empty')
+
     date = value
-    if isinstance(value, float):
+    if isinstance(value, (int, float)):
         return datetime.fromtimestamp(value)
 
     if date.endswith('Z'):
@@ -85,7 +89,7 @@ def lookup_field_alias(obj, field):
     return field, item
 
 
-def parse_network_value(value):
+def parse_network_value(value) -> List[Union[IPNetwork, IPRange]]:
     """
     Parse IP range or IP network values
     """

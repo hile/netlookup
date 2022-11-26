@@ -47,8 +47,7 @@ class QueryLookupCache(LoggingBaseClass):
         """
         Load cached JSON data
         """
-        print(f'Load cache file {self.cache_file}')
-        if not self.cache_file.exists():
+        if not self.cache_file or not self.cache_file.exists():
             return
         for record in json.loads(self.cache_file.read_text()):
             self.__responses__.append(self.__load_json_record__(record))
@@ -103,7 +102,7 @@ class WhoisAddressLookup(QueryLookupCache):
     def __init__(self, cache_file=None, debug_enabled=False, silent=False):
         self.__dns_lookup_table__ = {}
         self.__unmapped_fields__ = {}
-        super().__init__(debug_enabled=debug_enabled, silent=silent)
+        super().__init__(cache_file=cache_file, debug_enabled=debug_enabled, silent=silent)
 
     @property
     def __default_cache_file__(self):
