@@ -26,7 +26,7 @@ def find_address_in_networks(networks, value):
         if address.value == prefix.value or address in prefix:
             return prefix
 
-    # Match to network address value
+    # Match to network address value (i.e. 192.168.1.0 for 192.168.1.0/24)
     for network in networks:
         if address.value == network.value:
             return network
@@ -151,7 +151,7 @@ class Network(IPNetwork):
         return IPAddress(self.last - 1)
 
     @property
-    def next_subnet_prefix(self):
+    def next_subnet_prefix(self) -> Optional[int]:
         """
         Return next subnet prefix size, i.e. smaller prefix than this
 
@@ -166,7 +166,7 @@ class Network(IPNetwork):
         return self.prefixlen + 1
 
     @property
-    def parent_subnet_prefix(self):
+    def parent_subnet_prefix(self) -> Optional[int]:
         """
         Return parent subnet prefix size, i.e. one larger prefix than this
 

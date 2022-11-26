@@ -30,7 +30,7 @@ class Protocol(FileItem):
         self.aliases = aliases
         self.comment = comment.strip()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'{self.name} {self.number}'
 
 

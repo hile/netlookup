@@ -1,4 +1,6 @@
-
+"""
+Utilities for procesing network sets
+"""
 import re
 
 from dns import resolver

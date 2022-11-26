@@ -59,7 +59,7 @@ class Service(FileItem):
         self.aliases = aliases.strip()
         self.comment = comment.strip()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'{self.name} {self.port_number}/{self.protocol}'
 
 

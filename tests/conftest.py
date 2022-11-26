@@ -14,6 +14,8 @@ from .constants import (
     NETWORK_HOST_COUNT_VALUES,
     NETWORK_FIRST_HOST_VALUES,
     NETWORK_LAST_HOST_VALUES,
+    NETWORK_PARENT_PREFIX_SIZE_VALUES,
+    NETWORK_SUBNET_PREFIX_SIZE_VALUES,
     VALID_NETWORKS,
 )
 
@@ -120,7 +122,7 @@ def valid_network_list():
 @pytest.fixture(params=NETWORK_HOST_COUNT_VALUES)
 def network_host_count_value(request):
     """
-    Generate list of network, subnet host count values
+    Generate network, subnet host count value tuples
     """
     yield request.param
 
@@ -128,7 +130,7 @@ def network_host_count_value(request):
 @pytest.fixture(params=NETWORK_FIRST_HOST_VALUES)
 def network_first_host_tuple(request):
     """
-    Generate list of network, first host value tuples
+    Generate network, first host value value tuples
     """
     yield request.param
 
@@ -136,6 +138,22 @@ def network_first_host_tuple(request):
 @pytest.fixture(params=NETWORK_LAST_HOST_VALUES)
 def network_last_host_tuple(request):
     """
-    Generate list of network, last host value tuples
+    Generate network, last host value value tuples
+    """
+    yield request.param
+
+
+@pytest.fixture(params=NETWORK_PARENT_PREFIX_SIZE_VALUES)
+def network_parent_prefix_size(request):
+    """
+    Generate network, parent prefix size value tuples
+    """
+    yield request.param
+
+
+@pytest.fixture(params=NETWORK_SUBNET_PREFIX_SIZE_VALUES)
+def network_subnet_prefix_size(request):
+    """
+    Generate network, subnet prefix size value tuples
     """
     yield request.param

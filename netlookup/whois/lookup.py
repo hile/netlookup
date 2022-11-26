@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Whois query for IP addresses and DNS names
 """

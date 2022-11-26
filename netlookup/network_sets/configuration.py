@@ -1,4 +1,6 @@
-
+"""
+Network setcache directory configuration
+"""
 import sys
 from pathlib import Path
 
@@ -10,6 +12,4 @@ def get_cache_directory():
     """
     Return netlookup data cace directory
     """
-    if sys.platform == 'darwin':
-        return DARWIN_CACHE_DIRECTORY
-    return DEFAULT_CACHE_DIRECTORY
+    return DARWIN_CACHE_DIRECTORY if sys.platform == 'darwin' else DEFAULT_CACHE_DIRECTORY

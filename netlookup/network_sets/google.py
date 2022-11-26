@@ -1,4 +1,6 @@
-
+"""
+Google services address prefix set
+"""
 from datetime import datetime
 from operator import attrgetter
 
@@ -25,7 +27,7 @@ class GoogleServices(NetworkSet):
     cache_filename = 'google-service-networks.json'
     loader_class = GoogleServicePrefix
 
-    def fetch(self):
+    def fetch(self) -> None:
         """
         Feth google service ranges from DNS
         """

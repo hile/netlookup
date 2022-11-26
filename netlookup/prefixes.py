@@ -13,7 +13,7 @@ class Prefixes(NetworkList):
     """
     Loader and lookup for known IP address prefix caches for public clouds
     """
-    def __init__(self, cache_directory=None):
+    def __init__(self, cache_directory=None) -> None:
         super().__init__()
         if cache_directory is None:
             cache_directory = get_cache_directory()
@@ -27,7 +27,7 @@ class Prefixes(NetworkList):
 
         self.load()
 
-    def update(self):
+    def update(self) -> None:
         """
         Fetch and update cached prefix data
         """
@@ -39,14 +39,14 @@ class Prefixes(NetworkList):
                 raise NetworkError(f'Error updating {vendor} data: {error}') from error
         self.load()
 
-    def save(self):
+    def save(self) -> None:
         """
         Save cached data for vendors
         """
         for vendor in self.vendors:
             vendor.save()
 
-    def load(self):
+    def load(self) -> None:
         """
         Load cached networks
         """

@@ -1,4 +1,6 @@
-
+"""
+Google Cloud address prefix set
+"""
 from datetime import datetime
 from operator import attrgetter
 
@@ -25,7 +27,7 @@ class GCP(NetworkSet):
     cache_filename = 'gcp-networks.json'
     loader_class = GCPPrefix
 
-    def fetch(self):
+    def fetch(self) -> None:
         """
         Fetch GCP network records from DNS
         """

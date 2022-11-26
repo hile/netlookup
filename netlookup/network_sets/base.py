@@ -1,8 +1,11 @@
-
+"""
+Base class for network set class
+"""
 import json
 
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 from netaddr.core import AddrFormatError
 from netaddr.ip.sets import IPSet
@@ -26,10 +29,10 @@ class NetworkSetItem(Network):
                 if attr in data:
                     setattr(self, attr, data[attr])
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'{self.type} {self.cidr}'
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.__repr__()
 
     def as_dict(self):
@@ -55,7 +58,7 @@ class NetworkSet:
     cache_filename = None
     loader_class = NetworkSetItem
 
-    def __init__(self, cache_directory=None, networks=None):
+    def __init__(self, cache_directory=None, networks=None) -> None:
         if cache_directory is None:
             cache_directory = get_cache_directory()
         self.cache_directory = Path(cache_directory).expanduser()
@@ -74,7 +77,7 @@ class NetworkSet:
             for network in networks:
                 self.add_network(network)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.__networks__)
 
     def __iter__(self):
@@ -94,7 +97,7 @@ class NetworkSet:
             raise StopIteration from error
 
     @property
-    def cache_file(self):
+    def cache_file(self) -> Optional[Path]:
         """
         Filename for prefix data cache file
         """
@@ -103,12 +106,10 @@ class NetworkSet:
         return None
 
     @property
-    def ipset(self):
+    def ipset(self) -> IPSet:
         """
         IPSet of networks in network set
         """
-        for network in self.__networks__:
-            print('network', network, type(network))
         return IPSet([item.cidr for item in self.__networks__])
 
     @property
@@ -124,7 +125,7 @@ class NetworkSet:
         """
         raise NotImplementedError('fetch() must be implemented in child class')
 
-    def as_dict(self):
+    def as_dict(self) -> dict:
         """
         Return all networks as dictionary
         """
@@ -133,7 +134,7 @@ class NetworkSet:
             'networks': [prefix.as_dict() for prefix in self.__networks__]
         }
 
-    def add_network(self, value):
+    def add_network(self, value) -> None:
         """
         Add network to cache
         """
@@ -144,7 +145,7 @@ class NetworkSet:
         if network not in self.__networks__:
             self.__networks__.append(network)
 
-    def substract(self, networks):
+    def substract(self, networks) -> None:
         """
         Return merged network set, with specified network removed
         """
@@ -168,7 +169,7 @@ class NetworkSet:
         except Exception as error:
             raise NetworkError(f'Error reading cache file {self.cache_file}: {error}') from error
 
-    def load(self):
+    def load(self) -> None:
         """
         Load local cache file
         """
@@ -190,7 +191,7 @@ class NetworkSet:
         except Exception as error:
             raise NetworkError(f'Error loading data from cache file {self.cache_file}: {error}') from error
 
-    def save(self):
+    def save(self) -> None:
         """
         Save data to cache file
         """

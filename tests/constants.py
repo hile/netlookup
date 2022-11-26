@@ -31,6 +31,24 @@ INVALID_NETWORKS = (
     '192.168.3.0/33',
 )
 
+# List of 'network, parent prefix' pairs for unit tests
+NETWORK_PARENT_PREFIX_SIZE_VALUES = (
+    ('0.0.0.0/0', None),
+    ('192.168.64.65/32', 31),
+    ('2001::1/128', 127),
+    ('1.2.3.4/18', 17),
+    ('2001::1/48', 47),
+)
+
+# List of 'network, parent prefix' pairs for unit tests
+NETWORK_SUBNET_PREFIX_SIZE_VALUES = (
+    ('255.255.255.255', None),
+    ('192.168.64.65/32', None),
+    ('2001::1/128', None),
+    ('1.2.3.4/18', 19),
+    ('2001::1/48', 49),
+)
+
 # List of 'network, first host' pairs for unit tests
 NETWORK_FIRST_HOST_VALUES = (
     ('192.168.64.0/24', IPAddress('192.168.64.1')),
@@ -42,16 +60,6 @@ NETWORK_FIRST_HOST_VALUES = (
 )
 
 # List of 'network, last host' pairs for unit tests
-NETWORK_HOST_COUNT_VALUES = (
-    ('192.168.64.65/32', 1),
-    ('2001::1/128', 1),
-    ('192.168.64.65/31', 2),
-    ('2001::1/127', 2),
-    ('192.168.8.96/15', 131070),
-    ('2001:999:61:2660:2950::/64', 18446744073709551614),
-)
-
-# List of 'network, last host' pairs for unit tests
 NETWORK_LAST_HOST_VALUES = (
     ('192.168.64.65/32', None),
     ('2001::1/128', None),
@@ -59,6 +67,16 @@ NETWORK_LAST_HOST_VALUES = (
     ('2001::1/127', IPAddress('2001::1')),
     ('192.168.8.96/15', IPAddress('192.169.255.254')),
     ('2001:999:61:2660:2950::/64', IPAddress('2001:999:61:2660:ffff:ffff:ffff:fffe')),
+)
+
+# List of 'network, last host' pairs for unit tests
+NETWORK_HOST_COUNT_VALUES = (
+    ('192.168.64.65/32', 1),
+    ('2001::1/128', 1),
+    ('192.168.64.65/31', 2),
+    ('2001::1/127', 2),
+    ('192.168.8.96/15', 131070),
+    ('2001:999:61:2660:2950::/64', 18446744073709551614),
 )
 
 # JSON encoder output test cases for netlookup.encoders.NetworkDataEncoder
