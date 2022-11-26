@@ -15,7 +15,7 @@ from sys_toolkit.textfile import LineTextFile
 from ..encoders import NetworkDataEncoder
 from ..exceptions import WhoisQueryError
 
-from .constants import RESPONSE_MAX_AGE_SECONDS
+from .constants import RESPONSE_MAX_AGE_SECONDS, WhoisQueryType
 from .response import PWhoisQueryResponse, WhoisQueryResponse
 from .utils import parse_datetime
 
@@ -56,6 +56,8 @@ class QueryLookupCache(LoggingBaseClass):
         """
         Write resolved entires to JSON cache file
         """
+        if not self.cache_file:
+            raise WhoisQueryError('Cache file is not defined')
         if not self.cache_file.parent.is_dir():
             self.cache_file.parent.mkdir(parents=True)
         with self.cache_file.open('w') as filedescriptor:
@@ -124,7 +126,7 @@ class WhoisAddressLookup(QueryLookupCache):
             query_type=query_type
         )
         response.__query__ = query
-        if query_type == 'dns' and query:
+        if query_type == WhoisQueryType.DOMAIN and query:
             self.__dns_lookup_table__[query] = response
         return response
 
@@ -195,7 +197,11 @@ class WhoisAddressLookup(QueryLookupCache):
         if response is not None:
             return response
 
-        response = WhoisQueryResponse(self, debug_enabled=self.__debug_enabled__, silent=self.__setattr__)
+        response = WhoisQueryResponse(
+            self,
+            debug_enabled=self.__debug_enabled__,
+            silent=self.__setattr__
+        )
         response.query(value)
         if not response.groups:
             raise WhoisQueryError('Whois query returns no data')

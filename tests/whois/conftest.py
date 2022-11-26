@@ -5,9 +5,12 @@ from pathlib import Path
 
 import pytest
 
+from sys_toolkit.tests.mock import MockRunCommandLineOutput
+
 from netlookup.whois.lookup import WhoisAddressLookup
 from netlookup.whois.response import WhoisQueryResponse
 
+from ..conftest import MOCK_DATA
 from .constants import (
     INVALID_DATETIME_VALUES,
     INVALID_FIELD_VALUES,
@@ -18,13 +21,52 @@ from .constants import (
     VALID_WHOIS_RESPONSE_NETWORK_VALUES,
 )
 
+MOCK_ADDRESS_LIST_FILE = MOCK_DATA.joinpath('whois/addresses.txt')
+MOCK_QUERY_DOMAIN_FILE = MOCK_DATA.joinpath('whois/domain.txt')
+MOCK_QUERY_REVERSE_FILE = MOCK_DATA.joinpath('whois/reverse.txt')
+
+
+def mock_whois_query_response_data(monkeypatch, path: Path) -> str:
+    """
+    Mock response data for whois lookup query from text file
+    """
+    mock_response = MockRunCommandLineOutput(path=path)
+    monkeypatch.setattr('netlookup.whois.response.run_command_lineoutput', mock_response)
+    return mock_response
+
+
+@pytest.fixture
+def address_list_file():
+    """
+    Mock returning address list file
+    """
+    yield MOCK_ADDRESS_LIST_FILE
+
+
+@pytest.fixture
+def mock_whois_address_query(monkeypatch):
+    """
+    Mock whois query response for MOCK_WHOIS_QUERY_DOMAIN address query
+    """
+    mock_method = mock_whois_query_response_data(monkeypatch, MOCK_QUERY_REVERSE_FILE)
+    return mock_method
+
+
+@pytest.fixture
+def mock_whois_domain_query(monkeypatch):
+    """
+    Mock whois query response for MOCK_WHOIS_QUERY_DOMAIN domain query
+    """
+    mock_method = mock_whois_query_response_data(monkeypatch, MOCK_QUERY_DOMAIN_FILE)
+    return mock_method
+
 
 @pytest.fixture
 def mock_whois_default_cache(monkeypatch, tmpdir):
     """
     Generate an empty whois query response cache
     """
-    cache_file = Path(tmpdir.strpath, 'whois.cache')
+    cache_file = Path(tmpdir.strpath, 'config/whois.cache')
     monkeypatch.setattr('netlookup.whois.lookup.WHOIS_CACHE_FILE', cache_file)
     yield cache_file
 

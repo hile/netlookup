@@ -1,6 +1,8 @@
 """
 Constants for whois lookups
 """
+from enum import Enum
+
 
 RESPONSE_MAX_AGE_SECONDS = 86400
 
@@ -517,3 +519,12 @@ DOMAIN_FIELD_MAP = {
         'description': 'DNS Zone Contact',
     },
 }
+
+
+class WhoisQueryType(Enum):
+    """
+    Valid whois query types
+    """
+    ADDRESS = 'address'
+    DOMAIN = 'domain'
+    PREFIX = 'prefix'

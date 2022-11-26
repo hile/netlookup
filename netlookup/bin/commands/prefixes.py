@@ -12,7 +12,7 @@ class PrefixLookup(BaseCommand):
     """
     name = 'prefixes'
     short_description = 'Lookup prefixes'
-    __prefixes__ = Optional[Prefixes]
+    __prefixes__: Optional[Prefixes] = None
 
     def register_parser_arguments(self, parser):
         parser.add_argument('-u', '--update', action='store_true', help='Update prefix cache')
@@ -31,7 +31,7 @@ class PrefixLookup(BaseCommand):
         """
         Update the prefix cache
         """
-        self.message('Update prefix caches ...')
+        self.message('Update prefix caches')
         try:
             self.prefixes.update()
         except Exception as error:

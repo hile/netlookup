@@ -16,7 +16,7 @@ from sys_toolkit.subprocess import run_command_lineoutput
 from ..encoders import NetworkDataEncoder
 from ..exceptions import WhoisQueryError
 
-from .constants import ORGANIZATION_FIELDS
+from .constants import ORGANIZATION_FIELDS, WhoisQueryType
 from .groups import InformationSectionGroup, GROUP_LOADERS
 from .utils import parse_field_value
 
@@ -99,7 +99,7 @@ class BaseQueryResponse(LoggingBaseClass):
         """
         self.__stdout__ = stdout
         self.__stderr__ = stderr
-        self.__query_type__ = query_type
+        self.__query_type__ = WhoisQueryType(query_type)
         self.groups = []
 
         list(self.__stdout_item_iterator__())
@@ -117,7 +117,7 @@ class PWhoisQueryResponse(BaseQueryResponse):
     """
     def __init__(self, whois, debug_enabled=False, silent=False):
         super().__init__(whois, debug_enabled=debug_enabled, silent=silent)
-        self.__query_type__ = 'prefix'
+        self.__query_type__ = WhoisQueryType.PREFIX
 
     def query(self, query):
         """
@@ -149,7 +149,7 @@ class WhoisQueryResponse(BaseQueryResponse):
         self.networks = []
 
     def __repr__(self):
-        if self.__query_type__ == 'address':
+        if self.__query_type__ == WhoisQueryType.ADDRESS:
             return f'{self.smallest_network} {self.description}'
         if self.__query__ is not None:
             return self.__query__
@@ -231,7 +231,7 @@ class WhoisQueryResponse(BaseQueryResponse):
         super().__load_data__(stdout, stderr, query_type, loaded_timestamp)
         self.__detect_networks__()
         if self.__query_type__ is None:
-            self.__query_type__ = 'address' if self.address_ranges else 'domain'
+            self.__query_type__ = WhoisQueryType.ADDRESS if self.address_ranges else WhoisQueryType.DOMAIN
 
     def query(self, query):
         """
