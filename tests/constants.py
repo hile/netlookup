@@ -4,6 +4,8 @@ Unit test constants for netlookup module
 from datetime import datetime, timezone
 from netaddr.ip import IPAddress, IPNetwork, IPRange
 
+from netlookup.whois.constants import WhoisQueryType
+
 # How many times we may try splitting
 MAX_SPLITS = 8
 
@@ -84,6 +86,7 @@ NETWORK_ENCODER_OUTPUT_TESTCASES = (
     (IPAddress('192.168.64.65'), '"192.168.64.65"'),
     (IPNetwork('192.168.64.0/24'), '"192.168.64.0/24"'),
     (IPRange('192.168.64.1', '192.168.64.5'), '"192.168.64.1-192.168.64.5"'),
+    (WhoisQueryType.DOMAIN, '"domain"'),
     ({'a': 1, 'b': 2}, '{"a": 1, "b": 2}'),
     (
         datetime(year=2001, month=1, day=14, minute=14, tzinfo=timezone.utc),
