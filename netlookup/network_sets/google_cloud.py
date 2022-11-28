@@ -10,26 +10,26 @@ from .utils import process_google_rr_ranges
 ADDRESS_LIST_RECORD = '_cloud-netblocks.googleusercontent.com'
 
 
-class GCPPrefix(NetworkSetItem):
+class GoogleCloudPrefix(NetworkSetItem):
     """
     GCP cloud network prefix
     """
-    type = 'gcp'
+    type = 'google-cloud'
 
 
-class GCP(NetworkSet):
+class GoogleCloud(NetworkSet):
     """
     Google computing platform address ranges
 
     Note: this data currently does not include information about regions
     """
-    type = 'gcp'
-    cache_filename = 'gcp-networks.json'
-    loader_class = GCPPrefix
+    type = 'google-cloud'
+    cache_filename = 'google-cloud-networks.json'
+    loader_class = GoogleCloudPrefix
 
     def fetch(self) -> None:
         """
-        Fetch GCP network records from DNS
+        Fetch Google Cloud network records from DNS
         """
         self.__networks__.clear()
         for network in process_google_rr_ranges(ADDRESS_LIST_RECORD, self.loader_class):

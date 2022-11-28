@@ -3,10 +3,10 @@ from operator import attrgetter
 from pathlib import Path
 
 from .network import NetworkList, NetworkError, find_address_in_networks
-from .network_sets.configuration import get_cache_directory
+from .network_sets.constants import DEFAULT_CACHE_DIRECTORY
 from .network_sets.aws import AWS
-from .network_sets.gcp import GCP
 from .network_sets.google import GoogleServices
+from .network_sets.google_cloud import GoogleCloud
 
 
 class Prefixes(NetworkList):
@@ -15,13 +15,12 @@ class Prefixes(NetworkList):
     """
     def __init__(self, cache_directory=None) -> None:
         super().__init__()
-        if cache_directory is None:
-            cache_directory = get_cache_directory()
+        cache_directory = cache_directory if cache_directory is not None else DEFAULT_CACHE_DIRECTORY
         self.cache_directory = Path(cache_directory).expanduser()
 
         self.vendors = [
             AWS(cache_directory=self.cache_directory),
-            GCP(cache_directory=self.cache_directory),
+            GoogleCloud(cache_directory=self.cache_directory),
             GoogleServices(cache_directory=self.cache_directory),
         ]
 

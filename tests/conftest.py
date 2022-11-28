@@ -28,6 +28,13 @@ MOCK_PREFIX_LOOKUP_CACHE_FILE = MOCK_DATA.joinpath('whois/pwhois_cache.json')
 MOCK_WHOIS_LOOKUP_CACHE_FILE = MOCK_DATA.joinpath('whois/cache.json')
 
 
+def mock_platform(monkeypatch, platform: str):
+    """
+    Mock sys.platform value for specified environment
+    """
+    monkeypatch.setattr('sys.platform', platform)
+
+
 def mock_environment_services(monkeypatch, environment):
     """
     Mock loading of environment's /etc/services from mock data
