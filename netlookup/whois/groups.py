@@ -231,9 +231,9 @@ class Changed(AddressMappedItem):
     """
     Record changed date details
     """
-    __groups__ = [
+    __groups__ = (
         'changed',
-    ]
+    )
 
 
 class Contacts(AddressMappedItem):
@@ -241,9 +241,9 @@ class Contacts(AddressMappedItem):
     Contact person
     """
     __section__ = 'contacts'
-    __groups__ = [
+    __groups__ = (
         'contact',
-    ]
+    )
 
 
 class ContactPerson(AddressMappedItem):
@@ -251,28 +251,37 @@ class ContactPerson(AddressMappedItem):
     Contact person
     """
     __section__ = 'contacts'
-    __groups__ = [
+    __groups__ = (
         'person',
-    ]
+    )
 
 
 class CustomerName(AddressMappedItem):
     """
     Customer name
     """
-    __groups__ = [
-        'cust_name'
-    ]
+    __groups__ = (
+        'cust_name',
+    )
+
+
+class Description(AddressMappedItem):
+    """
+    Description for the prefix
+    """
+    __groups__ = (
+        'descr',
+    )
 
 
 class Domain(AddressMappedItem):
     """
     Domain name
     """
-    __groups__ = [
+    __groups__ = (
         'domain',
-        'domain_name'
-    ]
+        'domain_name',
+    )
     __field_map__ = DOMAIN_FIELD_MAP
 
 
@@ -280,9 +289,9 @@ class DomainHolder(AddressMappedItem):
     """
     Domain holder
     """
-    __groups__ = [
+    __groups__ = (
         'holder',
-    ]
+    )
     __field_map__ = {
         'holder_email': {
             'field': 'domain_holder_email',
@@ -300,9 +309,9 @@ class IncidentResponseTeam(AddressMappedItem):
     Incident Response Team
     """
     __section__ = 'incident_response_team'
-    __groups__ = [
-        'irt'
-    ]
+    __groups__ = (
+        'irt',
+    )
     __field_map__ = {
         'auth': {
             'field': 'authorization',
@@ -323,9 +332,9 @@ class InetNum(NetworkObject):
     """
     InetNum IPv4 network range
     """
-    __groups__ = [
-        'inetnum'
-    ]
+    __groups__ = (
+        'inetnum',
+    )
     __field_map__ = {
         'mnt_domains': {
             'field': 'maintainer_reverse_delegation',
@@ -358,9 +367,9 @@ class Inet6Num(NetworkObject):
     """
     Inet6Num IPv6 network range
     """
-    __groups__ = [
-        'inet6num'
-    ]
+    __groups__ = (
+        'inet6num',
+    )
     __field_map__ = {
         'assignment_size': {
             'field': 'assignment_size',
@@ -374,9 +383,9 @@ class Nameservers(AddressMappedItem):
     Nameserver for domain
     """
     __section__ = 'nameservers'
-    __groups__ = [
-        'nserver'
-    ]
+    __groups__ = (
+        'nserver',
+    )
     __field_map__ = {
         'ds_rdata': {
             'field': 'delegation_signer_rr_data',
@@ -418,29 +427,29 @@ class NetworkRange(NetworkObject):
     """
     Network range
     """
-    __groups__ = [
+    __groups__ = (
         'net_range',
-    ]
+    )
 
 
 class NicHandle(AddressMappedItem):
     """
     NIC handle
     """
-    __groups__ = [
-        'nic_handle'
-    ]
+    __groups__ = (
+        'nic_handle',
+    )
 
 
 class Organization(AddressMappedItem):
     """
     Organization information
     """
-    __groups__ = [
+    __groups__ = (
         'organisation',
         'organization',
-        'org_name'
-    ]
+        'org_name',
+    )
     __field_map__ = {
         'mnt_ref': {
             'field': 'maintainer_ref',
@@ -453,7 +462,7 @@ class OrganizationContact(AddressMappedItem):
     """
     Organization contact handle
     """
-    __groups__ = [
+    __groups__ = (
         'nic_handle',
         'nic_hdl',
         'nic_hdl_br',
@@ -464,7 +473,7 @@ class OrganizationContact(AddressMappedItem):
         'r_abuse_handle',
         'rnoc_handle',
         'r_tech_handle',
-    ]
+    )
     __field_map__ = {
         'mnt_domains': {
             'field': 'mnt_domains',
@@ -477,19 +486,19 @@ class ReferralServer(InformationSectionGroup):
     """
     Whois server reference
     """
-    __groups__ = [
+    __groups__ = (
         'refer',
         'referral_server',
-    ]
+    )
 
 
 class Registrar(AddressMappedItem):
     """
     DNS domain registrar
     """
-    __groups__ = [
-        'registrar'
-    ]
+    __groups__ = (
+        'registrar',
+    )
     __field_aliases__ = {
         'registrar_url': {
             'www',
@@ -508,45 +517,54 @@ class Remarks(AddressMappedItem):
     """
     Role
     """
-    __groups__ = [
-        'remarks'
-    ]
+    __groups__ = (
+        'remarks',
+    )
 
 
 class ResourceLink(InformationSectionGroup):
     """
     Resource link
     """
-    __groups__ = [
+    __groups__ = (
         'resource_link',
-    ]
+    )
 
 
 class Role(AddressMappedItem):
     """
     Role
     """
-    __groups__ = [
-        'role'
-    ]
+    __groups__ = (
+        'role',
+    )
 
 
 class Route(NetworkObject):
     """
     Details for a route
     """
-    __groups__ = [
+    __groups__ = (
         'route',
-    ]
+    )
+
+
+class Route6(NetworkObject):
+    """
+    Details for a IPv6 route
+    """
+    __groups__ = (
+        'route6',
+    )
 
 
 class WhoisServer(InformationSectionGroup):
     """
     Whois response
     """
-    __groups__ = [
+    __groups__ = (
         'whois',
-    ]
+    )
 
 
 GROUP_LOADERS = (
@@ -554,6 +572,7 @@ GROUP_LOADERS = (
     ContactPerson,
     Contacts,
     CustomerName,
+    Description,
     Domain,
     DomainHolder,
     IncidentResponseTeam,
@@ -570,5 +589,6 @@ GROUP_LOADERS = (
     ResourceLink,
     Role,
     Route,
+    Route6,
     WhoisServer,
 )

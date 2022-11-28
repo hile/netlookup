@@ -16,7 +16,7 @@ from ..encoders import NetworkDataEncoder
 from ..exceptions import WhoisQueryError
 
 from .constants import RESPONSE_MAX_AGE_SECONDS, WhoisQueryType
-from .response import PWhoisQueryResponse, WhoisQueryResponse
+from .response import PrefixLookupResponse, WhoisLookupResponse
 from .utils import parse_datetime
 
 PREFIX_CACHE_FILE = Path('~/.config/netlookup/pwhois.json').expanduser()
@@ -27,9 +27,11 @@ class QueryLookupCache(LoggingBaseClass):
     """
     Common base class for whois query lookup cachdes
     """
+
     def __init__(self, cache_file=None, debug_enabled=False, silent=False):
         super().__init__(debug_enabled=debug_enabled, silent=silent)
         self.cache_file = cache_file if cache_file is not None else self.__default_cache_file__
+        self.__unmapped_fields__ = {}
         self.__responses__ = []
         self.load_cache()
 
@@ -37,7 +39,19 @@ class QueryLookupCache(LoggingBaseClass):
         raise NotImplementedError
 
     def __format_json_data__(self):
-        raise NotImplementedError
+        """
+        Format written data as JSON for saving to cache file
+        """
+        now = datetime.now().timestamp()
+        return [
+            {
+                'query_type': response.__query_type__,
+                'query': response.__query__,
+                'loaded_timestamp': response.__loaded__ if response.__loaded__ else now,
+                'lines': response.__stdout__,
+            }
+            for response in self.__responses__
+        ]
 
     @property
     def __default_cache_file__(self):
@@ -96,55 +110,6 @@ class QueryLookupCache(LoggingBaseClass):
         """
         return self.query(value, max_age)
 
-
-class WhoisAddressLookup(QueryLookupCache):
-    """
-    Query whois for IP address details
-    """
-    def __init__(self, cache_file=None, debug_enabled=False, silent=False):
-        self.__dns_lookup_table__ = {}
-        self.__unmapped_fields__ = {}
-        super().__init__(cache_file=cache_file, debug_enabled=debug_enabled, silent=silent)
-
-    @property
-    def __default_cache_file__(self):
-        return WHOIS_CACHE_FILE
-
-    def __load_json_record__(self, record):
-        """
-        Load a JSON record from cached data
-        """
-        query_type = record.get('query_type', None)
-        query = record.get('query', None)
-        loaded_timestamp = parse_datetime(record['loaded_timestamp']).timestamp()
-        stdout = record['lines']
-        response = WhoisQueryResponse(self, debug_enabled=self.__debug_enabled__, silent=self.__silent__)
-        response.__load_data__(
-            stdout=stdout,
-            stderr=[],
-            loaded_timestamp=loaded_timestamp,
-            query_type=query_type
-        )
-        response.__query__ = query
-        if query_type == WhoisQueryType.DOMAIN and query:
-            self.__dns_lookup_table__[query] = response
-        return response
-
-    def __format_json_data__(self):
-        """
-        Format written data as JSON for saving to cache file
-        """
-        now = datetime.now().timestamp()
-        return [
-            {
-                'query_type': response.__query_type__,
-                'query': response.__query__,
-                'loaded_timestamp': response.__loaded__ if response.__loaded__ else now,
-                'lines': response.__stdout__,
-            }
-            for response in self.__responses__
-        ]
-
     def log_unmapped_field(self, group, field):
         """
         Store unmapped fields and log to debug log
@@ -158,6 +123,42 @@ class WhoisAddressLookup(QueryLookupCache):
         if field not in table:
             self.debug(f'unmapped field {type(group)} {section} {field}')
             table.append(field)
+
+
+class WhoisLookup(QueryLookupCache):
+    """
+    Query whois for domain or IP address details
+    """
+    def __init__(self, cache_file=None, debug_enabled=False, silent=False):
+        self.__dns_lookup_table__ = {}
+        super().__init__(cache_file=cache_file, debug_enabled=debug_enabled, silent=silent)
+
+    @property
+    def __default_cache_file__(self):
+        return WHOIS_CACHE_FILE
+
+    def __load_json_record__(self, record) -> WhoisLookupResponse:
+        """
+        Load a JSON record from cached data
+        """
+        query_type = record.get('query_type', None)
+        query = record.get('query', None)
+        loaded_timestamp = parse_datetime(record['loaded_timestamp']).timestamp()
+        stdout = record['lines']
+        # Old value for 'domain' type was 'dns'
+        query_type = WhoisQueryType.DOMAIN.value if query_type == 'dns' else query_type
+
+        response = WhoisLookupResponse(self, debug_enabled=self.__debug_enabled__, silent=self.__silent__)
+        response.__load_data__(
+            stdout=stdout,
+            stderr=[],
+            loaded_timestamp=loaded_timestamp,
+            query_type=query_type
+        )
+        response.__query__ = query
+        if query_type == WhoisQueryType.DOMAIN.value and query:
+            self.__dns_lookup_table__[query] = response
+        return response
 
     def match(self, value, max_age=None):
         """
@@ -197,7 +198,7 @@ class WhoisAddressLookup(QueryLookupCache):
         if response is not None:
             return response
 
-        response = WhoisQueryResponse(
+        response = WhoisLookupResponse(
             self,
             debug_enabled=self.__debug_enabled__,
             silent=self.__setattr__
@@ -233,11 +234,23 @@ class PrefixLookup(QueryLookupCache):
     def __default_cache_file__(self):
         return PREFIX_CACHE_FILE
 
-    def __load_json_record__(self, record):
-        return None
-
-    def __format_json_data__(self):
-        return {}
+    def __load_json_record__(self, record) -> PrefixLookupResponse:
+        """
+        Load a JSON record from cached data
+        """
+        query_type = record.get('query_type', None)
+        query = record.get('query', None)
+        loaded_timestamp = parse_datetime(record['loaded_timestamp']).timestamp()
+        stdout = record['lines']
+        response = PrefixLookupResponse(self, debug_enabled=self.__debug_enabled__, silent=self.__silent__)
+        response.__load_data__(
+            stdout=stdout,
+            stderr=[],
+            loaded_timestamp=loaded_timestamp,
+            query_type=query_type
+        )
+        response.__query__ = query
+        return response
 
     def match(self, value, max_age=None):
         """
@@ -264,10 +277,11 @@ class PrefixLookup(QueryLookupCache):
         if response is not None:
             return response
 
-        response = PWhoisQueryResponse(
+        response = PrefixLookupResponse(
             self,
             debug_enabled=self.__debug_enabled__,
-            silent=self.__setattr__)
+            silent=self.__setattr__
+        )
         response.query(value)
         self.__responses__.append(response)
         try:

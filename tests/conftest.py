@@ -5,8 +5,11 @@ from pathlib import Path
 
 import pytest
 
+from sys_toolkit.tests.mock import MockRunCommandLineOutput
+
 from netlookup.network import Network
 from netlookup.prefixes import Prefixes
+from netlookup.whois import PrefixLookup, WhoisLookup
 
 from .constants import (
     INVALID_NETWORKS,
@@ -21,6 +24,8 @@ from .constants import (
 
 MOCK_DATA = Path(__file__).parent.joinpath('mock')
 MOCK_PREFIXES_CACHE_DIRECTORY = MOCK_DATA.joinpath('prefixes/cache')
+MOCK_PREFIX_LOOKUP_CACHE_FILE = MOCK_DATA.joinpath('whois/pwhois_cache.json')
+MOCK_WHOIS_LOOKUP_CACHE_FILE = MOCK_DATA.joinpath('whois/cache.json')
 
 
 def mock_environment_services(monkeypatch, environment):
@@ -49,6 +54,32 @@ def mock_prefixes_cache() -> Prefixes:
     Return prefixes object with cache path from mocked data
     """
     yield Prefixes(cache_directory=MOCK_PREFIXES_CACHE_DIRECTORY)
+
+
+@pytest.fixture
+def mock_whois_query_no_data(monkeypatch) -> str:
+    """
+    Mock query for whois query to return no data
+    """
+    mock_response = MockRunCommandLineOutput(stdout='', stderr='')
+    monkeypatch.setattr('netlookup.whois.response.run_command_lineoutput', mock_response)
+    return mock_response
+
+
+@pytest.fixture
+def mock_whois_lookup_cache() -> WhoisLookup:
+    """
+    Return whois address lookup object with cache file from mocked data
+    """
+    yield WhoisLookup(cache_file=MOCK_WHOIS_LOOKUP_CACHE_FILE)
+
+
+@pytest.fixture
+def mock_prefix_lookup_cache() -> PrefixLookup:
+    """
+    Return prefix address lookup object with cache file from mocked data
+    """
+    yield PrefixLookup(cache_file=MOCK_PREFIX_LOOKUP_CACHE_FILE)
 
 
 @pytest.fixture

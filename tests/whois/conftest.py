@@ -7,8 +7,8 @@ import pytest
 
 from sys_toolkit.tests.mock import MockRunCommandLineOutput
 
-from netlookup.whois.lookup import WhoisAddressLookup
-from netlookup.whois.response import WhoisQueryResponse
+from netlookup.whois.lookup import WhoisLookup
+from netlookup.whois.response import WhoisLookupResponse
 
 from ..conftest import MOCK_DATA
 from .constants import (
@@ -77,7 +77,7 @@ def empty_whois_query_cache(mock_whois_default_cache):
     """
     Generate an empty whois query response cache
     """
-    yield WhoisAddressLookup(cache_file=mock_whois_default_cache)
+    yield WhoisLookup(cache_file=mock_whois_default_cache)
 
 
 @pytest.fixture
@@ -85,7 +85,7 @@ def empty_whois_response():
     """
     Generate an empty whois response for unit tests
     """
-    yield WhoisQueryResponse(WhoisAddressLookup())
+    yield WhoisLookupResponse(WhoisLookup())
 
 
 @pytest.fixture(params=INVALID_DATETIME_VALUES)

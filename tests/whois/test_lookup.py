@@ -4,14 +4,20 @@ Unit tests for netlookup.whois.lookup module
 import pytest
 
 from netlookup.exceptions import WhoisQueryError
-from netlookup.whois import WhoisAddressLookup
+from netlookup.whois import PrefixLookup, WhoisLookup
 from netlookup.whois.constants import WhoisQueryType
 from netlookup.whois.lookup import QueryLookupCache
+from netlookup.whois.response import PrefixLookupResponse, WhoisLookupResponse
 
-from .constants import MOCK_WHOIS_QUERY_ADDRESS, MOCK_WHOIS_QUERY_DOMAIN
+from .constants import (
+    MOCK_PWHOIS_RESPONSE_COUNT,
+    MOCK_PWHOIS_QUERY_ADDRESS,
+    MOCK_WHOIS_QUERY_ADDRESS,
+    MOCK_WHOIS_QUERY_DOMAIN,
+)
 
 
-def validate_empty_address_lookup_cache(whois: WhoisAddressLookup) -> None:
+def validate_empty_address_lookup_cache(whois: WhoisLookup) -> None:
     """
     Validate properties of an empty whois address lookup cache
     """
@@ -53,26 +59,57 @@ def test_whois_query_lookup_cache_base_class_properties(address_list_file):
 
 def test_whois_address_lookup_empty_default_cache_properties(mock_whois_default_cache):
     """
-    Test properties of a WhoisAddressLookup with empty default query cache
+    Test properties of a WhoisLookup with empty default query cache
     """
-    whois = WhoisAddressLookup()
+    whois = WhoisLookup()
     assert whois.cache_file == mock_whois_default_cache
     validate_empty_address_lookup_cache(whois)
 
 
 def test_whois_address_lookup_empty_cache_properties(empty_whois_query_cache) -> None:
     """
-    Test properties of a WhoisAddressLookup with empty query cache
+    Test properties of a WhoisLookup with empty query cache
     """
     validate_empty_address_lookup_cache(empty_whois_query_cache)
 
 
+# pylint: disable=unused-argument
+def test_whois_address_lookup_cache_file(
+        mock_whois_query_no_data,
+        mock_whois_lookup_cache):
+    """
+    Mock loading whois lookup object with cached items
+    """
+    whois = mock_whois_lookup_cache
+    assert whois.cache_file.exists()
+    assert isinstance(whois, WhoisLookup)
+    for item in whois.__dns_lookup_table__.values():
+        print(item)
+    res = whois.query(MOCK_WHOIS_QUERY_DOMAIN)
+    assert isinstance(res, WhoisLookupResponse)
+
+
+# pylint: disable=unused-argument
+def test_prefix_address_lookup_cache_file(
+        mock_whois_query_no_data,
+        mock_prefix_lookup_cache):
+    """
+    Mock loading prefix lookup object with cached items
+    """
+    prefixes = mock_prefix_lookup_cache
+    assert len(prefixes.__responses__) == MOCK_PWHOIS_RESPONSE_COUNT
+    assert prefixes.cache_file.exists()
+    assert isinstance(prefixes, PrefixLookup)
+    res = prefixes.query(MOCK_PWHOIS_QUERY_ADDRESS)
+    assert isinstance(res, PrefixLookupResponse)
+
+
 def test_whois_address_lookup_cache_write(mock_whois_default_cache) -> None:
     """
-    Test properties of a WhoisAddressLookup with empty query cache
+    Test properties of a WhoisLookup with empty query cache
     """
     assert not mock_whois_default_cache.exists()
-    whois = WhoisAddressLookup()
+    whois = WhoisLookup()
     assert not whois.cache_file.exists()
 
     whois.write_cache()
@@ -89,7 +126,7 @@ def test_whois_address_lookup_domain_success(mock_whois_default_cache, mock_whoi
     """
     Test successful lookup for address lookup with mocked command output
     """
-    whois = WhoisAddressLookup()
+    whois = WhoisLookup()
     response = whois.query(MOCK_WHOIS_QUERY_DOMAIN)
     assert mock_whois_domain_query.call_count == 1
     assert response.__query__ == MOCK_WHOIS_QUERY_DOMAIN
@@ -103,7 +140,7 @@ def test_whois_address_lookup_address_success(mock_whois_default_cache, mock_who
     """
     Test successful lookup for address lookup with mocked command output
     """
-    whois = WhoisAddressLookup()
+    whois = WhoisLookup()
     response = whois.query(MOCK_WHOIS_QUERY_ADDRESS)
     assert mock_whois_address_query.call_count == 1
     assert response.__query__ == MOCK_WHOIS_QUERY_ADDRESS

@@ -13371,7 +13371,7 @@
     ]
   },
   {
-    "query_type": "dns",
+    "query_type": "domain",
     "query": "tuohela.net",
     "loaded_timestamp": 1589690215.387185,
     "lines": [

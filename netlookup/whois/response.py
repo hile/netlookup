@@ -29,13 +29,16 @@ class BaseQueryResponse(LoggingBaseClass):
     """
     Common base class for query responses
     """
-    __group_loaders__ = None
+    __group_loaders__ = GROUP_LOADERS
     __fallback_group_loader__ = None
 
     def __init__(self, whois, debug_enabled=False, silent=False):
         super().__init__(debug_enabled=debug_enabled, silent=silent)
         self.whois = whois
         self.groups = []
+        self.address_ranges = []
+        self.networks = []
+
         self.__query_type__ = None
         self.__query__ = None
         self.__stdout__ = None
@@ -93,6 +96,24 @@ class BaseQueryResponse(LoggingBaseClass):
             if group is not None:
                 group.parse_line(line)
 
+    def __detect_networks__(self):
+        """
+        Detect network ranges and networks in groups
+        """
+        self.networks = []
+        self.address_ranges = []
+
+        for group in self.groups:
+            for address_range in group.address_ranges:
+                if address_range not in self.address_ranges:
+                    self.address_ranges.append(address_range)
+            for network in group.networks:
+                if network not in self.networks:
+                    self.networks.append(network)
+
+        self.address_ranges.sort(key=attrgetter('size'))
+        self.networks.sort(key=attrgetter('size'))
+
     def __load_data__(self, stdout, stderr, query_type=None, loaded_timestamp=None):
         """
         Load data from pwhois query response
@@ -109,15 +130,41 @@ class BaseQueryResponse(LoggingBaseClass):
             self.__loaded__ = loaded_timestamp
         else:
             self.__loaded__ = datetime.now().timestamp()
+        self.__detect_networks__()
+
+    @property
+    def smallest_network(self):
+        """
+        Return smallest network for a response
+        """
+        if self.networks:
+            return self.networks[0]
+        return None
 
 
-class PWhoisQueryResponse(BaseQueryResponse):
+class PrefixLookupResponse(BaseQueryResponse):
     """
     Query response from whois.pwhois.org server (prefix whois data)
     """
     def __init__(self, whois, debug_enabled=False, silent=False):
         super().__init__(whois, debug_enabled=debug_enabled, silent=silent)
         self.__query_type__ = WhoisQueryType.PREFIX
+
+    def __repr__(self) -> str:
+        return str(self.smallest_network) if self.smallest_network else None
+
+    def match(self, query) -> bool:
+        """
+        Match query to smallest network in response
+
+        Response usually contains the parent inetnum delegation which we
+        don't want to match
+        """
+        if self.networks:
+            return query in self.networks[0]
+        if self.__query__:
+            return self.__query__ == query
+        return None
 
     def query(self, query):
         """
@@ -134,19 +181,39 @@ class PWhoisQueryResponse(BaseQueryResponse):
         except CommandError as error:
             raise WhoisQueryError(error) from error
 
+    def as_dict(self):
+        """
+        Return data as dictionary
+        """
+        return {
+            'groups': self.groups,
+        }
 
-class WhoisQueryResponse(BaseQueryResponse):
+    def as_json(self):
+        """
+        Return whois query result as JSON
+        """
+        response = {}
+        for group in self.groups:
+            for key, value in group.as_dict().items():
+                if key not in response:
+                    response[key] = value
+                elif not isinstance(response[key], list):
+                    response[key] = [response[key]] + [value]
+                else:
+                    response[key].append(value)
+        return json.dumps(response, indent=2, cls=NetworkDataEncoder)
+
+
+class WhoisLookupResponse(BaseQueryResponse):
     """
     Query whois servers and parse data from responses
     """
-    __group_loaders__ = GROUP_LOADERS
     __fallback_group_loader__ = InformationSectionGroup
 
     def __init__(self, whois, debug_enabled=False, silent=False):
         super().__init__(whois, debug_enabled=debug_enabled, silent=silent)
         self.__query_type__ = None
-        self.address_ranges = []
-        self.networks = []
 
     def __repr__(self):
         if self.__query_type__ == WhoisQueryType.ADDRESS:
@@ -154,15 +221,6 @@ class WhoisQueryResponse(BaseQueryResponse):
         if self.__query__ is not None:
             return self.__query__
         return str(self.__class__)
-
-    @property
-    def smallest_network(self):
-        """
-        Return smallest network for a response
-        """
-        if self.networks:
-            return self.networks[0]
-        return None
 
     # pylint: disable=too-many-nested-blocks
     @property
@@ -189,24 +247,6 @@ class WhoisQueryResponse(BaseQueryResponse):
                 return organization
         return ''
 
-    def __detect_networks__(self):
-        """
-        Detect network ranges and networks in groups
-        """
-        self.networks = []
-        self.address_ranges = []
-
-        for group in self.groups:
-            for address_range in group.address_ranges:
-                if address_range not in self.address_ranges:
-                    self.address_ranges.append(address_range)
-            for network in group.networks:
-                if network not in self.networks:
-                    self.networks.append(network)
-
-        self.address_ranges.sort(key=attrgetter('size'))
-        self.networks.sort(key=attrgetter('size'))
-
     @staticmethod
     def __detect_query_type__(query):
         """
@@ -229,7 +269,6 @@ class WhoisQueryResponse(BaseQueryResponse):
         Load data from response
         """
         super().__load_data__(stdout, stderr, query_type, loaded_timestamp)
-        self.__detect_networks__()
         if self.__query_type__ is None:
             self.__query_type__ = WhoisQueryType.ADDRESS if self.address_ranges else WhoisQueryType.DOMAIN
 
