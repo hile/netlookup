@@ -7,7 +7,8 @@ from typing import Optional
 
 import pytest
 
-from sys_toolkit.tests.mock import MockCalledMethod, MockRunCommandLineOutput
+from dns.resolver import NXDOMAIN
+from sys_toolkit.tests.mock import MockCalledMethod, MockException, MockRunCommandLineOutput
 
 from netlookup.network import Network
 from netlookup.network_sets.aws import AWS_IP_RANGES_URL
@@ -52,7 +53,6 @@ class MockGoogleDnsAnswer(MockCalledMethod):
         super().__call__(record=record, rrtype=rrtype)
         try:
             record = f'{record.rstrip(".")}.'
-            print('MOCK', record)
             return create_dns_txt_query_response(record, GOOGLE_NETWORK_SET_SPF_RECORDS[record])
         except KeyError as error:
             raise ValueError(f'Unexpected query key: "{record}"') from error
@@ -86,16 +86,6 @@ def mock_environment_protocols(monkeypatch, environment):
 
 
 @pytest.fixture
-def mock_google_dns_requests(monkeypatch):
-    """
-    Mock responses to Google DNS queries
-    """
-    mock_answer = MockGoogleDnsAnswer()
-    monkeypatch.setattr('netlookup.network_sets.google.resolver.resolve', mock_answer)
-    return mock_answer
-
-
-@pytest.fixture
 def mock_aws_ip_ranges(requests_mock):
     """
     Mock response for AWS IP ranges HTTP request with data from file
@@ -119,6 +109,26 @@ def mock_aws_ip_ranges_not_found(requests_mock):
         status_code=HTTPStatus.NOT_FOUND,
     )
     yield adapter
+
+
+@pytest.fixture
+def mock_google_dns_requests(monkeypatch):
+    """
+    Mock responses to Google DNS queries
+    """
+    mock_answer = MockGoogleDnsAnswer()
+    monkeypatch.setattr('netlookup.network_sets.google.resolver.resolve', mock_answer)
+    return mock_answer
+
+
+@pytest.fixture
+def mock_google_dns_requests_error(monkeypatch):
+    """
+    Mock error raised for responses to Google DNS queries
+    """
+    mock_error = MockException(NXDOMAIN)
+    monkeypatch.setattr('netlookup.network_sets.google.resolver.resolve', mock_error)
+    return mock_error
 
 
 @pytest.fixture

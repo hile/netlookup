@@ -23,10 +23,10 @@ def test_network_sets_aws_update_http_error(mock_prefixes_cache_empty, mock_aws_
     Test updating the AWS network with empty cache and HTTP error code
     """
     aws = mock_prefixes_cache_empty.get_vendor('aws')
-    assert len(aws.__networks__) == 0
+    assert len(aws) == 0
     with pytest.raises(NetworkError):
         aws.fetch()
-    assert len(aws.__networks__) == 0
+    assert len(aws) == 0
 
 
 # pylint: disable=unused-argument
@@ -35,9 +35,9 @@ def test_network_sets_aws_update(mock_prefixes_cache_empty, mock_aws_ip_ranges) 
     Test updating the AWS network with empty cache
     """
     aws = mock_prefixes_cache_empty.get_vendor('aws')
-    assert len(aws.__networks__) == 0
+    assert len(aws) == 0
     aws.fetch()
-    assert len(aws.__networks__) == MOCK_AWS_IP_RANGES_COUNT
+    assert len(aws) == MOCK_AWS_IP_RANGES_COUNT
     for network in aws:
         assert isinstance(network.__repr__(), str)
 

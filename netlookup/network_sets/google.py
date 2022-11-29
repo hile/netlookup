@@ -9,6 +9,7 @@ from typing import Optional
 
 from dns import resolver
 
+from ..exceptions import NetworkError
 from .base import NetworkSet, NetworkSetItem
 
 RE_INCLUDE = re.compile(r'^include:(?P<rr>.*)$')
@@ -26,8 +27,8 @@ def google_rr_dns_query(record: str) -> Optional[str]:
     try:
         res = resolver.resolve(record, 'TXT')
         return str(res.rrset[0].strings[0], 'utf-8')
-    except (resolver.NoAnswer, resolver.NXDOMAIN):
-        return None
+    except (resolver.NoAnswer, resolver.NXDOMAIN) as error:
+        raise NetworkError(f'Error querying TXT record for {record}: {error}') from error
 
 
 def process_google_rr_ranges(record: str, loader_class):

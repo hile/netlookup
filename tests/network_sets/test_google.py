@@ -1,6 +1,9 @@
 """
 Unit tests for netlookup.whois.network_sets.google module
 """
+import pytest
+
+from netlookup.exceptions import NetworkError
 from netlookup.network_sets.google import GoogleCloud, GoogleServices
 
 from .common import validate_network_set_properties
@@ -26,12 +29,24 @@ def test_network_sets_google_cloud_update(
         mock_prefixes_cache_empty,
         mock_google_dns_requests) -> None:
     """
-    Test updating google services network sets with mocked DNS response data
+    Test updating google cloud network sets with mocked DNS response data
     """
     google_cloud_prefixes = mock_prefixes_cache_empty.get_vendor('google-cloud')
-    assert len(google_cloud_prefixes.__networks__) == 0
+    assert len(google_cloud_prefixes) == 0
     google_cloud_prefixes.fetch()
-    assert len(google_cloud_prefixes.__networks__) == MOCK_GOOGLE_CLOUD_IP_RANGES_COUNT
+    assert len(google_cloud_prefixes) == MOCK_GOOGLE_CLOUD_IP_RANGES_COUNT
+
+
+# pylint: disable=unused-argument
+def test_network_sets_google_cloud_update_error(
+        mock_prefixes_cache_empty,
+        mock_google_dns_requests_error) -> None:
+    """
+    Test updating google cloud network sets with NXDOMAIN error
+    """
+    google_cloud_prefixes = mock_prefixes_cache_empty.get_vendor('google-cloud')
+    with pytest.raises(NetworkError):
+        google_cloud_prefixes.fetch()
 
 
 # pylint: disable=unused-argument
@@ -42,6 +57,18 @@ def test_network_sets_google_services_update(
     Test updating google services network sets with mocked DNS response data
     """
     google_services_prefixes = mock_prefixes_cache_empty.get_vendor('google')
-    assert len(google_services_prefixes.__networks__) == 0
+    assert len(google_services_prefixes) == 0
     google_services_prefixes.fetch()
-    assert len(google_services_prefixes.__networks__) == MOCK_GOOGLE_SERVICE_IP_RANGES_COUNT
+    assert len(google_services_prefixes) == MOCK_GOOGLE_SERVICE_IP_RANGES_COUNT
+
+
+# pylint: disable=unused-argument
+def test_network_sets_google_services_update_error(
+        mock_prefixes_cache_empty,
+        mock_google_dns_requests_error) -> None:
+    """
+    Test updating google services network sets with NXDOMAIN error
+    """
+    google_services_prefixes = mock_prefixes_cache_empty.get_vendor('google')
+    with pytest.raises(NetworkError):
+        google_services_prefixes.fetch()
