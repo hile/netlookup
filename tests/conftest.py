@@ -12,6 +12,7 @@ from sys_toolkit.tests.mock import MockCalledMethod, MockException, MockRunComma
 
 from netlookup.network import Network
 from netlookup.network_sets.aws import AWS_IP_RANGES_URL
+from netlookup.network_sets.cloudflare import CLOUDFLARE_IP_RANGES_IPV4_URL, CLOUDFLARE_IP_RANGES_IPV6_URL
 from netlookup.prefixes import Prefixes
 from netlookup.whois import PrefixLookup, WhoisLookup
 
@@ -31,7 +32,11 @@ from .utils import create_dns_txt_query_response
 MOCK_DATA = Path(__file__).parent.joinpath('mock')
 
 MOCK_AWS_IP_RANGES_FILE = MOCK_DATA.joinpath('network_sets/aws_ip_ranges.json')
+MOCK_CLOUDFLARE_V4_RANGES_FILE = MOCK_DATA.joinpath('network_sets/cloudflare_ipv4.txt')
+MOCK_CLOUDFLARE_V6_RANGES_FILE = MOCK_DATA.joinpath('network_sets/cloudflare_ipv6.txt')
+
 MOCK_AWS_IP_RANGES_COUNT = 7042
+MOCK_CLOUDFLARE_IP_RANGES_COUNT = 22
 MOCK_GOOGLE_CLOUD_IP_RANGES_COUNT = 74
 MOCK_GOOGLE_SERVICE_IP_RANGES_COUNT = 27
 
@@ -106,6 +111,58 @@ def mock_aws_ip_ranges_not_found(requests_mock):
     adapter = requests_mock.register_uri(
         'GET',
         AWS_IP_RANGES_URL,
+        status_code=HTTPStatus.NOT_FOUND,
+    )
+    yield adapter
+
+
+@pytest.fixture
+def mock_cloudflare_ip4_ranges(requests_mock):
+    """
+    Mock response for Cloudflare IPv4 ranges HTTP request with data from file
+    """
+    adapter = requests_mock.register_uri(
+        'GET',
+        CLOUDFLARE_IP_RANGES_IPV4_URL,
+        text=MOCK_CLOUDFLARE_V4_RANGES_FILE.read_text(encoding='UTF-8')
+    )
+    yield adapter
+
+
+@pytest.fixture
+def mock_cloudflare_ip4_ranges_not_found(requests_mock):
+    """
+    Mock response for Cloudflare IPv4 ranges HTTP request with NOT FOUND HTTP status
+    """
+    adapter = requests_mock.register_uri(
+        'GET',
+        CLOUDFLARE_IP_RANGES_IPV4_URL,
+        status_code=HTTPStatus.NOT_FOUND,
+    )
+    yield adapter
+
+
+@pytest.fixture
+def mock_cloudflare_ip6_ranges(requests_mock):
+    """
+    Mock response for Cloudflare IPv4 ranges HTTP request with data from file
+    """
+    adapter = requests_mock.register_uri(
+        'GET',
+        CLOUDFLARE_IP_RANGES_IPV6_URL,
+        text=MOCK_CLOUDFLARE_V6_RANGES_FILE.read_text(encoding='UTF-8')
+    )
+    yield adapter
+
+
+@pytest.fixture
+def mock_cloudflare_ip6_ranges_not_found(requests_mock):
+    """
+    Mock response for Cloudflare IPv6 ranges HTTP request with NOT FOUND HTTP status
+    """
+    adapter = requests_mock.register_uri(
+        'GET',
+        CLOUDFLARE_IP_RANGES_IPV6_URL,
         status_code=HTTPStatus.NOT_FOUND,
     )
     yield adapter

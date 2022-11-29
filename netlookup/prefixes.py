@@ -5,6 +5,7 @@ from pathlib import Path
 from .network import NetworkList, NetworkError, find_address_in_networks
 from .network_sets.constants import DEFAULT_CACHE_DIRECTORY
 from .network_sets.aws import AWS
+from .network_sets.cloudflare import Cloudflare
 from .network_sets.google import GoogleCloud, GoogleServices
 
 
@@ -17,8 +18,15 @@ class Prefixes(NetworkList):
         cache_directory = cache_directory if cache_directory is not None else DEFAULT_CACHE_DIRECTORY
         self.cache_directory = Path(cache_directory).expanduser()
 
+        if not self.cache_directory.exists():
+            try:
+                self.cache_directory.mkdir(parents=True)
+            except Exception as error:
+                raise NetworkError(f'Error creating directory {self.cache_directory}: {error}') from error
+
         self.vendors = [
             AWS(cache_directory=self.cache_directory),
+            Cloudflare(cache_directory=self.cache_directory),
             GoogleCloud(cache_directory=self.cache_directory),
             GoogleServices(cache_directory=self.cache_directory),
         ]

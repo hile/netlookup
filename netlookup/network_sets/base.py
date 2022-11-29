@@ -11,7 +11,6 @@ from netaddr.core import AddrFormatError
 from netaddr.ip.sets import IPSet
 
 from ..network import Network, NetworkList, NetworkError, find_address_in_networks
-from .constants import DEFAULT_CACHE_DIRECTORY
 
 
 class NetworkSetItem(Network):
@@ -58,17 +57,10 @@ class NetworkSet:
     loader_class = NetworkSetItem
 
     def __init__(self, cache_directory=None, networks=None) -> None:
-        cache_directory = cache_directory if cache_directory is not None else DEFAULT_CACHE_DIRECTORY
-        self.cache_directory = Path(cache_directory).expanduser()
+        self.cache_directory = cache_directory
         self.updated = None
         self.__networks__ = NetworkList()
         self.__iter_index__ = None
-
-        if not self.cache_directory.exists():
-            try:
-                self.cache_directory.mkdir(parents=True)
-            except Exception as error:
-                raise NetworkError(f'Error creating directory {self.cache_directory}: {error}') from error
 
         self.load()
         if networks is not None:

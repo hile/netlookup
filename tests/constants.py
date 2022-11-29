@@ -13,7 +13,7 @@ MAX_SPLITS = 8
 MOCK_PREFIXES_CACHE_LEN = 1511
 
 # Number of prefixes when all caches are loaded from APIs
-MOCK_PREFIXES_DATA_LEN = 7143
+MOCK_PREFIXES_DATA_LEN = 7165
 
 # Valid network values for unit testing
 VALID_NETWORKS = (
