@@ -1,17 +1,21 @@
 """
 Unit test configuration for netlookup module
 """
+from http import HTTPStatus
 from pathlib import Path
+from typing import Optional
 
 import pytest
 
-from sys_toolkit.tests.mock import MockRunCommandLineOutput
+from sys_toolkit.tests.mock import MockCalledMethod, MockRunCommandLineOutput
 
 from netlookup.network import Network
+from netlookup.network_sets.aws import AWS_IP_RANGES_URL
 from netlookup.prefixes import Prefixes
 from netlookup.whois import PrefixLookup, WhoisLookup
 
 from .constants import (
+    GOOGLE_NETWORK_SET_SPF_RECORDS,
     INVALID_NETWORKS,
     NETWORK_ENCODER_OUTPUT_TESTCASES,
     NETWORK_HOST_COUNT_VALUES,
@@ -21,11 +25,37 @@ from .constants import (
     NETWORK_SUBNET_PREFIX_SIZE_VALUES,
     VALID_NETWORKS,
 )
+from .utils import create_dns_txt_query_response
 
 MOCK_DATA = Path(__file__).parent.joinpath('mock')
+
+MOCK_AWS_IP_RANGES_FILE = MOCK_DATA.joinpath('network_sets/aws_ip_ranges.json')
+MOCK_AWS_IP_RANGES_COUNT = 7042
+MOCK_GOOGLE_CLOUD_IP_RANGES_COUNT = 74
+MOCK_GOOGLE_SERVICE_IP_RANGES_COUNT = 27
+
 MOCK_PREFIXES_CACHE_DIRECTORY = MOCK_DATA.joinpath('prefixes/cache')
 MOCK_PREFIX_LOOKUP_CACHE_FILE = MOCK_DATA.joinpath('whois/pwhois_cache.json')
 MOCK_WHOIS_LOOKUP_CACHE_FILE = MOCK_DATA.joinpath('whois/cache.json')
+
+
+# pylint: disable=too-few-public-methods
+class MockGoogleDnsAnswer(MockCalledMethod):
+    """
+    Mock DNS resolver query answers
+    """
+    # pylint: disable=arguments-differ
+    def __call__(self, record: str, rrtype: str) -> Optional[str]:
+        """
+        Mock calls to dns.resolver.resolve for google DNS TXT records
+        """
+        super().__call__(record=record, rrtype=rrtype)
+        try:
+            record = f'{record.rstrip(".")}.'
+            print('MOCK', record)
+            return create_dns_txt_query_response(record, GOOGLE_NETWORK_SET_SPF_RECORDS[record])
+        except KeyError as error:
+            raise ValueError(f'Unexpected query key: "{record}"') from error
 
 
 def mock_platform(monkeypatch, platform: str):
@@ -53,6 +83,50 @@ def mock_environment_protocols(monkeypatch, environment):
         'netlookup.protocols.PROTOCOLS_FILE_PATH',
         str(MOCK_DATA.joinpath(f'platform/{environment}/protocols'))
     )
+
+
+@pytest.fixture
+def mock_google_dns_requests(monkeypatch):
+    """
+    Mock responses to Google DNS queries
+    """
+    mock_answer = MockGoogleDnsAnswer()
+    monkeypatch.setattr('netlookup.network_sets.google.resolver.resolve', mock_answer)
+    return mock_answer
+
+
+@pytest.fixture
+def mock_aws_ip_ranges(requests_mock):
+    """
+    Mock response for AWS IP ranges HTTP request with data from file
+    """
+    adapter = requests_mock.register_uri(
+        'GET',
+        AWS_IP_RANGES_URL,
+        text=MOCK_AWS_IP_RANGES_FILE.read_text(encoding='UTF-8')
+    )
+    yield adapter
+
+
+@pytest.fixture
+def mock_aws_ip_ranges_not_found(requests_mock):
+    """
+    Mock response for AWS IP ranges HTTP request with NOT FOUND HTTP status
+    """
+    adapter = requests_mock.register_uri(
+        'GET',
+        AWS_IP_RANGES_URL,
+        status_code=HTTPStatus.NOT_FOUND,
+    )
+    yield adapter
+
+
+@pytest.fixture
+def mock_prefixes_cache_empty(tmpdir):
+    """
+    Return prefixes object with cache path from mocked data
+    """
+    yield Prefixes(cache_directory=tmpdir.strpath)
 
 
 @pytest.fixture

@@ -5,8 +5,7 @@ from pathlib import Path
 from .network import NetworkList, NetworkError, find_address_in_networks
 from .network_sets.constants import DEFAULT_CACHE_DIRECTORY
 from .network_sets.aws import AWS
-from .network_sets.google import GoogleServices
-from .network_sets.google_cloud import GoogleCloud
+from .network_sets.google import GoogleCloud, GoogleServices
 
 
 class Prefixes(NetworkList):

@@ -23,7 +23,6 @@ class NetworkSetItem(Network):
 
     def __init__(self, network, data=None):
         super().__init__(network)
-
         if data is not None:
             for attr in self.extra_attributes:
                 if attr in data:
