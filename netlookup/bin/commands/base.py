@@ -10,15 +10,25 @@ class BaseCommand(Command):
     """
     networks = []
 
+    def __init__(self, parent, usage=None, description=None, epilog=None):
+        super().__init__(parent, usage, description, epilog)
+        self.errors = []
+
+    def error(self, *args) -> None:
+        """
+        Add error to self.errors and send it to parent class method
+        """
+        self.errors.append(f'{self.__parse_string_args__(*args)}')
+        super().error(*args)
+
     def parse_args(self, args=None, namespace=None):
         """
         Parse common arguments for netlookup commands
         """
         self.networks = []
-        if 'subnets' in args:
+        for subnet in getattr(args, 'subnets', []):
             try:
-                for arg in args.subnets:
-                    self.networks.append(Network(arg))
+                self.networks.append(Network(subnet))
             except Exception as error:
-                self.exit(1, f'Error parsing subnets: {error}')
+                self.exit(1, f'Error parsing subnet "{subnet}": {error}')
         return args

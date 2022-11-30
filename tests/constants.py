@@ -28,6 +28,18 @@ VALID_NETWORKS = (
     '2c0f:fb50:5000::',
 )
 
+SPLITTABLE_NETWORKS = (
+    '192.168.64.0/24',
+    '2001:14ba:3e9::/64',
+    '2c0f:fb50:4000::/36',
+)
+UNSPLITTABLE_NETWORKS = (
+    '127.0.0.1',
+    '10.0.0.0/32',
+    '::1',
+    '::1/128',
+)
+
 INVALID_NETWORKS = (
     '',
     'foobar',
@@ -99,6 +111,7 @@ NETWORK_ENCODER_OUTPUT_TESTCASES = (
     (False, 'false'),
 )
 
+PREFIXES_NO_MATCH = '255.254.252.251'
 PREFIXES_GOOGLE_SERVICES_MATCH = '2800:3f0:4004::123'
 PREFIXES_GOOGLE_CLOUD_MATCH = '8.34.210.5'
 

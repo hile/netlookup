@@ -13,4 +13,34 @@ def test_netlookup_info_add_no_arguments(monkeypatch):
     script = NetLookupScript()
     testargs = ['netlookup', 'info']
     with monkeypatch.context() as context:
-        validate_script_run_exception_with_args(script, context, testargs, exit_code=2)
+        validate_script_run_exception_with_args(script, context, testargs, exit_code=1)
+
+
+# pylint: disable=unused-argument
+def test_netlookup_prefixes_info_output(capsys, monkeypatch, mock_prefixes_data, valid_network):
+    """
+    Test running 'netlookup info' command with valid address valules
+    """
+    script = NetLookupScript()
+    testargs = ['netlookup', 'info', valid_network]
+    with monkeypatch.context() as context:
+        validate_script_run_exception_with_args(script, context, testargs, exit_code=0)
+
+    captured = capsys.readouterr()
+    assert captured.err == ''
+    assert len(captured.out.splitlines()) > 0
+
+
+# pylint: disable=unused-argument
+def test_netlookup_prefixes_info_invalid_network(capsys, monkeypatch, mock_prefixes_data, invalid_network):
+    """
+    Test running 'netlookup info' command with valid address valules
+    """
+    script = NetLookupScript()
+    testargs = ['netlookup', 'info', invalid_network]
+    with monkeypatch.context() as context:
+        validate_script_run_exception_with_args(script, context, testargs, exit_code=1)
+
+    captured = capsys.readouterr()
+    assert len(captured.err.splitlines()) == 1
+    assert captured.out == ''

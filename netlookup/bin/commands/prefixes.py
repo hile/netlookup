@@ -47,7 +47,7 @@ class PrefixLookup(BaseCommand):
                 if address:
                     self.message(address)
             except Exception as error:
-                self.error(f'Error looking up address {address}: {error}')
+                self.error(f'Error looking up address "{address}": {error}')
 
     def run(self, args):
         """
@@ -59,3 +59,5 @@ class PrefixLookup(BaseCommand):
             self.update_prefix_cache()
         if args.addresses:
             self.lookup_addresses(args.addresses)
+        if self.errors:
+            self.exit(1)

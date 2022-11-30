@@ -4,7 +4,7 @@ Unit test configuration for netlookup module
 
 from http import HTTPStatus
 from pathlib import Path
-from shutil import copyfile, rmtree
+from shutil import copyfile, copytree, rmtree
 from typing import Optional
 
 import pytest
@@ -28,6 +28,8 @@ from .constants import (
     NETWORK_LAST_HOST_VALUES,
     NETWORK_PARENT_PREFIX_SIZE_VALUES,
     NETWORK_SUBNET_PREFIX_SIZE_VALUES,
+    SPLITTABLE_NETWORKS,
+    UNSPLITTABLE_NETWORKS,
     VALID_NETWORKS,
 )
 from .utils import create_dns_txt_query_response
@@ -212,11 +214,28 @@ def mock_prefixes_cache_empty(tmpdir):
 
 
 @pytest.fixture
-def mock_prefixes_cache() -> Prefixes:
+def mock_prefixes_cache(tmpdir) -> Prefixes:
     """
-    Return prefixes object with cache path from mocked data
+    Return prefixes object with cache path from mocked data copied to temporary
+    directory
     """
-    yield Prefixes(cache_directory=MOCK_PREFIXES_CACHE_DIRECTORY)
+    cache_directory = Path(tmpdir.strpath, 'mock-valid-prefixes-cache')
+    copytree(MOCK_PREFIXES_CACHE_DIRECTORY, cache_directory)
+    yield Prefixes(cache_directory=cache_directory)
+
+
+# pylint: disable=redefined-outer-name,unused-argument
+@pytest.fixture
+def mock_prefixes_data(
+        mock_prefixes_cache,
+        mock_aws_ip_ranges,
+        mock_cloudflare_ip4_ranges,
+        mock_cloudflare_ip6_ranges,
+        mock_google_dns_requests):
+    """
+    Combined mock with temporary prefixes cache data and API update mocks
+    """
+    yield mock_prefixes_cache
 
 
 @pytest.fixture
@@ -367,6 +386,22 @@ def invalid_network(request):
 def valid_network(request):
     """
     Generate list of valid networks
+    """
+    yield request.param
+
+
+@pytest.fixture(params=SPLITTABLE_NETWORKS)
+def splittable_network(request):
+    """
+    Generate list of splittable networks
+    """
+    yield request.param
+
+
+@pytest.fixture(params=UNSPLITTABLE_NETWORKS)
+def unsplittable_network(request):
+    """
+    Generate list of unsplittable networks
     """
     yield request.param
 

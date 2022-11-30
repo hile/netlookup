@@ -11,17 +11,16 @@ class NetLookupScript(Script):
     """
     Netlookup CLI command
     """
+    subcommands = (
+        Info,
+        PrefixLookup,
+        Split,
+        Subtract,
+    )
 
 
 def main():
     """
     Main function for 'netlookup' CLI command
     """
-    script = NetLookupScript()
-
-    script.add_subcommand(Info(script))
-    script.add_subcommand(PrefixLookup(script))
-    script.add_subcommand(Split(script))
-    script.add_subcommand(Subtract(script))
-
-    script.run()
+    NetLookupScript().run()
