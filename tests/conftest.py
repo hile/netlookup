@@ -1,8 +1,10 @@
 """
 Unit test configuration for netlookup module
 """
+
 from http import HTTPStatus
 from pathlib import Path
+from shutil import copyfile, rmtree
 from typing import Optional
 
 import pytest
@@ -11,6 +13,7 @@ from dns.resolver import NXDOMAIN
 from sys_toolkit.tests.mock import MockCalledMethod, MockException, MockRunCommandLineOutput
 
 from netlookup.network import Network
+from netlookup.exceptions import NetworkError
 from netlookup.network_sets.aws import AWS_IP_RANGES_URL
 from netlookup.network_sets.cloudflare import CLOUDFLARE_IP_RANGES_IPV4_URL, CLOUDFLARE_IP_RANGES_IPV6_URL
 from netlookup.prefixes import Prefixes
@@ -31,6 +34,12 @@ from .utils import create_dns_txt_query_response
 
 MOCK_DATA = Path(__file__).parent.joinpath('mock')
 
+MOCK_PREFIXES_CACHE_DIRECTORY = MOCK_DATA.joinpath('prefixes/cache')
+MOCK_PREFIXES_CACHE_INVALID_DIRECTORY = MOCK_DATA.joinpath('prefixes/cache_invalid')
+
+MOCK_PREFIX_LOOKUP_CACHE_FILE = MOCK_DATA.joinpath('whois/pwhois_cache.json')
+MOCK_WHOIS_LOOKUP_CACHE_FILE = MOCK_DATA.joinpath('whois/cache.json')
+
 MOCK_AWS_IP_RANGES_FILE = MOCK_DATA.joinpath('network_sets/aws_ip_ranges.json')
 MOCK_CLOUDFLARE_V4_RANGES_FILE = MOCK_DATA.joinpath('network_sets/cloudflare_ipv4.txt')
 MOCK_CLOUDFLARE_V6_RANGES_FILE = MOCK_DATA.joinpath('network_sets/cloudflare_ipv6.txt')
@@ -39,10 +48,6 @@ MOCK_AWS_IP_RANGES_COUNT = 7042
 MOCK_CLOUDFLARE_IP_RANGES_COUNT = 22
 MOCK_GOOGLE_CLOUD_IP_RANGES_COUNT = 74
 MOCK_GOOGLE_SERVICE_IP_RANGES_COUNT = 27
-
-MOCK_PREFIXES_CACHE_DIRECTORY = MOCK_DATA.joinpath('prefixes/cache')
-MOCK_PREFIX_LOOKUP_CACHE_FILE = MOCK_DATA.joinpath('whois/pwhois_cache.json')
-MOCK_WHOIS_LOOKUP_CACHE_FILE = MOCK_DATA.joinpath('whois/cache.json')
 
 
 # pylint: disable=too-few-public-methods
@@ -189,6 +194,16 @@ def mock_google_dns_requests_error(monkeypatch):
 
 
 @pytest.fixture
+def mock_network_set_save_error(monkeypatch):
+    """
+    Mock raising exception from network set save method
+    """
+    mock_error = MockException(NetworkError)
+    monkeypatch.setattr('netlookup.network_sets.base.NetworkSet.save', mock_error)
+    yield mock_error
+
+
+@pytest.fixture
 def mock_prefixes_cache_empty(tmpdir):
     """
     Return prefixes object with cache path from mocked data
@@ -202,6 +217,70 @@ def mock_prefixes_cache() -> Prefixes:
     Return prefixes object with cache path from mocked data
     """
     yield Prefixes(cache_directory=MOCK_PREFIXES_CACHE_DIRECTORY)
+
+
+@pytest.fixture
+def mock_prefixes_cache_directory_missing(tmpdir) -> Prefixes:
+    """
+    Return prefixes cache directory path that is missing
+    """
+    cache_directory = Path(tmpdir.strpath, 'cache-directory-missing')
+    yield cache_directory
+    if cache_directory.exists():
+        print(f'remove temporary directory {cache_directory}')
+        rmtree(cache_directory)
+
+
+@pytest.fixture
+def mock_prefixes_cache_directory_missing_permission_denied(tmpdir) -> Prefixes:
+    """
+    Return prefixes cache directory path that is missing and can't be created
+    """
+    parent = Path(tmpdir.strpath, 'no-permissions')
+    cache_directory = parent.joinpath('cache-directory-missing')
+    if not parent.is_dir():
+        parent.mkdir()
+        parent.chmod(int('0500', 8))
+    yield cache_directory
+
+
+@pytest.fixture
+def mock_prefixes_cache_permission_denied(tmpdir) -> Prefixes:
+    """
+    Return prefixes cache directory path with unreadable cache files
+    """
+    cache_directory = Path(tmpdir.strpath, 'cache-no-permissions')
+    cache_directory.mkdir()
+    for cache_file in MOCK_PREFIXES_CACHE_DIRECTORY.iterdir():
+        target = cache_directory.joinpath(cache_file.name)
+        copyfile(cache_file, target)
+        Path(target).chmod(int('0000', 8))
+    yield cache_directory
+    if cache_directory.exists():
+        rmtree(cache_directory)
+
+
+@pytest.fixture
+def mock_prefixes_cache_invalid_address_data() -> Prefixes:
+    """
+    Return prefixes cache directory path with invalid address data
+    """
+    yield MOCK_PREFIXES_CACHE_INVALID_DIRECTORY
+
+
+@pytest.fixture
+def mock_prefixes_cache_invalid_json_data(tmpdir) -> Prefixes:
+    """
+    Return prefixes cache directory path with invalid JSON data
+    """
+    cache_directory = Path(tmpdir.strpath, 'cache-no-permissions')
+    cache_directory.mkdir()
+    for cache_file in MOCK_PREFIXES_CACHE_DIRECTORY.iterdir():
+        target = cache_directory.joinpath(cache_file.name)
+        target.write_text('this is not a json file', encoding='utf-8')
+    yield cache_directory
+    if cache_directory.exists():
+        rmtree(cache_directory)
 
 
 @pytest.fixture
@@ -223,11 +302,13 @@ def mock_whois_lookup_cache() -> WhoisLookup:
 
 
 @pytest.fixture
-def mock_prefix_lookup_cache() -> PrefixLookup:
+def mock_prefix_lookup_cache(tmpdir) -> PrefixLookup:
     """
     Return prefix address lookup object with cache file from mocked data
     """
-    yield PrefixLookup(cache_file=MOCK_PREFIX_LOOKUP_CACHE_FILE)
+    cache_file = Path(tmpdir.strpath).joinpath('pwhois_cache.json')
+    copyfile(MOCK_PREFIX_LOOKUP_CACHE_FILE, cache_file)
+    yield PrefixLookup(cache_file=cache_file)
 
 
 @pytest.fixture

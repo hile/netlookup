@@ -1,0 +1,13 @@
+{
+  "updated": "2019-06-28T23:19:05",
+  "networks": [
+    {
+      "type": "aws",
+      "cidr": "1.2.3.4.5/33",
+      "region": "GLOBAL",
+      "services": [
+        "CLOUDFRONT"
+      ]
+    }
+  ]
+}

@@ -92,11 +92,14 @@ def test_whois_address_lookup_cache_file(
 # pylint: disable=unused-argument
 def test_prefix_address_lookup_cache_file(
         mock_whois_query_no_data,
+        mock_whois_lookup_cache,
         mock_prefix_lookup_cache):
     """
     Mock loading prefix lookup object with cached items
     """
     prefixes = mock_prefix_lookup_cache
+    for prefix in prefixes.__responses__:
+        print(prefix)
     assert len(prefixes.__responses__) == MOCK_PWHOIS_RESPONSE_COUNT
     assert prefixes.cache_file.exists()
     assert isinstance(prefixes, PrefixLookup)

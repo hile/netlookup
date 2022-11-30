@@ -9,12 +9,14 @@ from netlookup.network_sets.aws import AWS
 from ..conftest import MOCK_AWS_IP_RANGES_COUNT
 from .common import validate_network_set_properties
 
+VENDOR = 'aws'
+
 
 def test_network_sets_aws_properties(mock_prefixes_cache) -> None:
     """
     Test properties of AWS network set
     """
-    validate_network_set_properties(mock_prefixes_cache.get_vendor('aws'), AWS)
+    validate_network_set_properties(mock_prefixes_cache.get_vendor(VENDOR), AWS)
 
 
 # pylint: disable=unused-argument
@@ -22,11 +24,13 @@ def test_network_sets_aws_update_http_error(mock_prefixes_cache_empty, mock_aws_
     """
     Test updating the AWS network with empty cache and HTTP error code
     """
-    aws = mock_prefixes_cache_empty.get_vendor('aws')
+    aws = mock_prefixes_cache_empty.get_vendor(VENDOR)
     assert len(aws) == 0
     with pytest.raises(NetworkError):
         aws.fetch()
     assert len(aws) == 0
+
+    assert len(mock_prefixes_cache_empty.filter_type(VENDOR)) == 0
 
 
 # pylint: disable=unused-argument
@@ -34,7 +38,7 @@ def test_network_sets_aws_update(mock_prefixes_cache_empty, mock_aws_ip_ranges) 
     """
     Test updating the AWS network with empty cache
     """
-    aws = mock_prefixes_cache_empty.get_vendor('aws')
+    aws = mock_prefixes_cache_empty.get_vendor(VENDOR)
     assert len(aws) == 0
     aws.fetch()
     assert len(aws) == MOCK_AWS_IP_RANGES_COUNT

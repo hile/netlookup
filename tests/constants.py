@@ -10,7 +10,7 @@ from netlookup.whois.constants import WhoisQueryType
 MAX_SPLITS = 8
 
 # Number of items in mock/prefixes/cache directory data
-MOCK_PREFIXES_CACHE_LEN = 1511
+MOCK_PREFIXES_CACHE_LEN = 1533
 
 # Number of prefixes when all caches are loaded from APIs
 MOCK_PREFIXES_DATA_LEN = 7165
@@ -98,6 +98,9 @@ NETWORK_ENCODER_OUTPUT_TESTCASES = (
     (123, '123'),
     (False, 'false'),
 )
+
+PREFIXES_GOOGLE_SERVICES_MATCH = '2800:3f0:4004::123'
+PREFIXES_GOOGLE_CLOUD_MATCH = '8.34.210.5'
 
 # SPF records for google services and google cloud as of November 2022
 GOOGLE_NETWORK_SET_SPF_RECORDS = {
