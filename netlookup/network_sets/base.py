@@ -56,7 +56,7 @@ class NetworkSet:
     cache_filename = None
     loader_class = NetworkSetItem
 
-    def __init__(self, cache_directory=None, networks=None) -> None:
+    def __init__(self, networks=None, cache_directory=None) -> None:
         self.cache_directory = cache_directory
         self.updated = None
         self.__networks__ = NetworkList()
@@ -107,7 +107,7 @@ class NetworkSet:
         """
         Minimal merged set of IP range set covering network set
         """
-        return [self.loader_class(network) for network in self.ipset.iter_cidrs()]
+        return self.__class__(networks=[self.loader_class(network) for network in self.ipset.iter_cidrs()])
 
     def fetch(self):
         """
@@ -147,7 +147,7 @@ class NetworkSet:
                 ipset.remove(network)
             except AddrFormatError as error:
                 raise NetworkError(f'Error processing network {network}: {error}') from error
-        return [self.loader_class(network) for network in ipset.iter_cidrs()]
+        return self.__class__(networks=[self.loader_class(network) for network in ipset.iter_cidrs()])
 
     def __read_cache_file__(self):
         """
