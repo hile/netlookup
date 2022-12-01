@@ -36,14 +36,6 @@ def mock_whois_query_response_data(monkeypatch, path: Path) -> str:
 
 
 @pytest.fixture
-def address_list_file():
-    """
-    Mock returning address list file
-    """
-    yield MOCK_ADDRESS_LIST_FILE
-
-
-@pytest.fixture
 def mock_whois_address_query(monkeypatch):
     """
     Mock whois query response for MOCK_WHOIS_QUERY_DOMAIN address query
@@ -86,6 +78,14 @@ def empty_whois_response():
     Generate an empty whois response for unit tests
     """
     yield WhoisLookupResponse(WhoisLookup())
+
+
+@pytest.fixture
+def address_list_file():
+    """
+    Mock returning address list file
+    """
+    yield MOCK_ADDRESS_LIST_FILE
 
 
 @pytest.fixture(params=INVALID_DATETIME_VALUES)

@@ -46,6 +46,7 @@ MOCK_AWS_IP_RANGES_FILE = MOCK_DATA.joinpath('network_sets/aws_ip_ranges.json')
 MOCK_CLOUDFLARE_V4_RANGES_FILE = MOCK_DATA.joinpath('network_sets/cloudflare_ipv4.txt')
 MOCK_CLOUDFLARE_V6_RANGES_FILE = MOCK_DATA.joinpath('network_sets/cloudflare_ipv6.txt')
 
+MOCK_WHOIS_CACHE_RESPONSE_COUNT = 164
 MOCK_AWS_IP_RANGES_COUNT = 7042
 MOCK_CLOUDFLARE_IP_RANGES_COUNT = 22
 MOCK_GOOGLE_CLOUD_IP_RANGES_COUNT = 74
@@ -313,11 +314,13 @@ def mock_whois_query_no_data(monkeypatch) -> str:
 
 
 @pytest.fixture
-def mock_whois_lookup_cache() -> WhoisLookup:
+def mock_whois_lookup_cache(tmpdir) -> WhoisLookup:
     """
     Return whois address lookup object with cache file from mocked data
     """
-    yield WhoisLookup(cache_file=MOCK_WHOIS_LOOKUP_CACHE_FILE)
+    cache_file = Path(tmpdir.strpath).joinpath('whois_cache.json')
+    copyfile(MOCK_WHOIS_LOOKUP_CACHE_FILE, cache_file)
+    yield WhoisLookup(cache_file=cache_file)
 
 
 @pytest.fixture

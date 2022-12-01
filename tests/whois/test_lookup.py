@@ -3,12 +3,15 @@ Unit tests for netlookup.whois.lookup module
 """
 import pytest
 
+from netaddr.ip import IPAddress
+
 from netlookup.exceptions import WhoisQueryError
 from netlookup.whois import PrefixLookup, WhoisLookup
 from netlookup.whois.constants import WhoisQueryType
-from netlookup.whois.lookup import QueryLookupCache
+from netlookup.whois.lookup import QueryLookupCache, PREFIX_CACHE_FILE, WHOIS_CACHE_FILE
 from netlookup.whois.response import PrefixLookupResponse, WhoisLookupResponse
 
+from ..conftest import MOCK_WHOIS_CACHE_RESPONSE_COUNT
 from .constants import (
     MOCK_PWHOIS_RESPONSE_COUNT,
     MOCK_PWHOIS_QUERY_ADDRESS,
@@ -35,6 +38,7 @@ def validate_empty_address_lookup_cache(whois: WhoisLookup) -> None:
     assert whois.__unmapped_fields__ == {}
 
     assert whois.match('1.2.3.4') is None
+    assert whois.match(IPAddress('1.2.3.4')) is None
 
     # pylint: disable=use-implicit-booleaness-not-comparison
     assert whois.filter_keys('test_key') == []
@@ -52,9 +56,43 @@ def test_whois_query_lookup_cache_base_class_properties(address_list_file):
     with pytest.raises(NotImplementedError):
         obj.match('no such thing')
     with pytest.raises(NotImplementedError):
-        obj.resolve_address_list_file(address_list_file)
+        obj.resolve_lookup_strings(address_list_file)
     with pytest.raises(WhoisQueryError):
         obj.write_cache()
+
+
+# pylint: disable=unused-argument
+def test_whois_address_lookup_resolve_lookup_strings(
+        mock_whois_lookup_cache,
+        mock_whois_address_query,
+        address_list_file):
+    """
+    Test whois address lookup function to resolve a list of addresses
+    """
+    whois = mock_whois_lookup_cache
+    assert len(whois.__responses__) == MOCK_WHOIS_CACHE_RESPONSE_COUNT
+    whois.resolve_lookup_strings(address_list_file)
+    # Two items in cache were not part of the mocked cache and were mock resolved
+    assert len(whois.__responses__) == MOCK_WHOIS_CACHE_RESPONSE_COUNT + 2
+
+
+# pylint: disable=unused-argument
+def test_whois_address_lookup_resolve_lookup_strings_query_error(
+        capsys,
+        mock_whois_lookup_cache,
+        mock_whois_query_no_data,
+        address_list_file):
+    """
+    Test whois address lookup function to resolve a list of addresses with query errors
+    """
+    whois = mock_whois_lookup_cache
+    assert len(whois.__responses__) == MOCK_WHOIS_CACHE_RESPONSE_COUNT
+    whois.resolve_lookup_strings(address_list_file)
+    # Two non-matches resulted to query errors
+    captured = capsys.readouterr()
+    assert captured.out == ''
+    assert len(captured.err.splitlines()) == 2
+    assert len(whois.__responses__) == MOCK_WHOIS_CACHE_RESPONSE_COUNT
 
 
 def test_whois_address_lookup_empty_default_cache_properties(mock_whois_default_cache):
@@ -81,6 +119,7 @@ def test_whois_address_lookup_cache_file(
     Mock loading whois lookup object with cached items
     """
     whois = mock_whois_lookup_cache
+    assert whois.__default_cache_file__ == WHOIS_CACHE_FILE
     assert whois.cache_file.exists()
     assert isinstance(whois, WhoisLookup)
     for item in whois.__dns_lookup_table__.values():
@@ -98,13 +137,16 @@ def test_prefix_address_lookup_cache_file(
     Mock loading prefix lookup object with cached items
     """
     prefixes = mock_prefix_lookup_cache
+    assert prefixes.__default_cache_file__ == PREFIX_CACHE_FILE
     for prefix in prefixes.__responses__:
         print(prefix)
     assert len(prefixes.__responses__) == MOCK_PWHOIS_RESPONSE_COUNT
     assert prefixes.cache_file.exists()
     assert isinstance(prefixes, PrefixLookup)
-    res = prefixes.query(MOCK_PWHOIS_QUERY_ADDRESS)
-    assert isinstance(res, PrefixLookupResponse)
+    assert isinstance(prefixes.query(MOCK_PWHOIS_QUERY_ADDRESS), PrefixLookupResponse)
+    # This returns the item with prefixes.match
+    assert isinstance(prefixes.query(MOCK_PWHOIS_QUERY_ADDRESS), PrefixLookupResponse)
+    assert isinstance(prefixes.match(MOCK_PWHOIS_QUERY_ADDRESS), PrefixLookupResponse)
 
 
 def test_whois_address_lookup_cache_write(mock_whois_default_cache) -> None:
