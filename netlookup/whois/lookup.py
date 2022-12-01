@@ -85,15 +85,15 @@ class QueryLookupCache(LoggingBaseClass):
         """
         raise NotImplementedError
 
-    def query(self, value, max_age=RESPONSE_MAX_AGE_SECONDS):
+    def query(self, value, max_age=RESPONSE_MAX_AGE_SECONDS) -> None:
         """
         Query must be implemented in child class
         """
         raise NotImplementedError
 
-    def resolve_address_list_file(self, path):
+    def resolve_lookup_strings(self, path: str) -> None:
         """
-        Load file with lines of addresses and resolve them
+        Load file with lines of lookup strings and resolve them
         """
         path = Path(path).expanduser()
         for line in LineTextFile(path):
@@ -101,7 +101,7 @@ class QueryLookupCache(LoggingBaseClass):
                 try:
                     self.query(line)
                 except WhoisQueryError as error:
-                    self.error(error)
+                    self.error(f'error querying {line}: {error}')
         self.write_cache()
 
     def __call__(self, value, max_age=RESPONSE_MAX_AGE_SECONDS):
@@ -134,7 +134,7 @@ class WhoisLookup(QueryLookupCache):
         super().__init__(cache_file=cache_file, debug_enabled=debug_enabled, silent=silent)
 
     @property
-    def __default_cache_file__(self):
+    def __default_cache_file__(self) -> Path:
         return WHOIS_CACHE_FILE
 
     def __load_json_record__(self, record) -> WhoisLookupResponse:
