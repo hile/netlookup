@@ -1,3 +1,6 @@
+![Unit Tests](https://github.com/hile/netlookup/actions/workflows/unittest.yml/badge.svg)
+![Style Checks](https://github.com/hile/netlookup/actions/workflows/lint.yml/badge.svg)
+
 # Command line network lookups and operations
 
 This python tool implements pretty much same things as `netcalc` and `netblocks` libraries, but
