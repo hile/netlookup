@@ -171,12 +171,12 @@ class PrefixLookupResponse(BaseQueryResponse):
         Query pwhois cache for response
         """
         try:
-            print('run pwhois query', *('whois', str(query)))
             stdout, stderr = run_command_lineoutput(
                 *('whois', '-h', PREFIX_WHOIS_SERVER, str(query)),
                 encodings=LINE_ENCODINGS,
                 timeout=QUERY_TIMEOUT
             )
+            print(f'stdout {stdout} stderr {stderr}')
             self.__query__ = query
             self.__load_data__(stdout, stderr, query_type=self.__query_type__)
         except CommandError as error:
