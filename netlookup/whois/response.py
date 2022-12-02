@@ -151,7 +151,7 @@ class PrefixLookupResponse(BaseQueryResponse):
         self.__query_type__ = WhoisQueryType.PREFIX
 
     def __repr__(self) -> str:
-        return str(self.smallest_network) if self.smallest_network else None
+        return str(self.smallest_network) if self.smallest_network else ''
 
     def match(self, query) -> bool:
         """
@@ -164,7 +164,7 @@ class PrefixLookupResponse(BaseQueryResponse):
             return query in self.networks[0]
         if self.__query__:
             return self.__query__ == query
-        return None
+        return False
 
     def query(self, query):
         """
@@ -186,22 +186,16 @@ class PrefixLookupResponse(BaseQueryResponse):
         Return data as dictionary
         """
         return {
-            'groups': self.groups,
+            'networks': self.networks,
         }
 
     def as_json(self):
         """
-        Return whois query result as JSON
+        Return prefix whois query result as JSON
         """
-        response = {}
-        for group in self.groups:
-            for key, value in group.as_dict().items():
-                if key not in response:
-                    response[key] = value
-                elif not isinstance(response[key], list):
-                    response[key] = [response[key]] + [value]
-                else:
-                    response[key].append(value)
+        response = {
+            'networks': self.networks
+        }
         return json.dumps(response, indent=2, cls=NetworkDataEncoder)
 
 
@@ -254,7 +248,7 @@ class WhoisLookupResponse(BaseQueryResponse):
         """
         try:
             IPAddress(query)
-            return 'address'
+            return WhoisQueryType.ADDRESS.value
         except (ValueError, AddrFormatError):
             pass
 
@@ -262,7 +256,7 @@ class WhoisLookupResponse(BaseQueryResponse):
         for field in fields:
             if field == '' or len(field.split()) > 1:
                 raise WhoisQueryError(f'invalid whois query {query}')
-        return 'domain'
+        return WhoisQueryType.DOMAIN.value
 
     def __load_data__(self, stdout, stderr, query_type=None, loaded_timestamp=None):
         """
@@ -300,12 +294,14 @@ class WhoisLookupResponse(BaseQueryResponse):
         don't want to match
         """
         query_type = self.__detect_query_type__(query)
+        self.debug(f'match query {query} to self {self.__query__} networks {self.networks}')
         if query_type == 'address':
+            self.debug(f'match address {query} to {self.networks}')
             if self.networks:
                 return query in self.networks[0]
         if self.__query__:
             return self.__query__ == query
-        return None
+        return False
 
     def as_dict(self):
         """

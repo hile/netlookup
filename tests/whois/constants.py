@@ -1,12 +1,26 @@
 """
 Unit test constants for netlookup.whois modul
 """
+from netaddr.ip import IPNetwork
 
 MOCK_INETNUM_LINE = 'inetnum: 1.2.3.0 - 1.2.3.255'
 
 MOCK_WHOIS_QUERY_DOMAIN = 'tuohela.net'
-MOCK_WHOIS_QUERY_ADDRESS = '1.2.3.4'
+MOCK_WHOIS_QUERY_ADDRESS = '103.102.250.5'
+
+MOCK_PWHOIS_QUERY_MATCH = '2001:708:10:dead:beef::1'
 MOCK_PWHOIS_QUERY_ADDRESS = '192.168.23.1'
+
+MOCK_PWHOIS_QUERY_MATCH_NETWORKS = [
+    IPNetwork('2001:708:10::/48'),
+    IPNetwork('2001:600::/23'),
+]
+MOCK_PWHOIS_QUERY_RESPONSE_AS_JSON = """{
+  "networks": [
+    "2001:708:10::/48",
+    "2001:600::/23"
+  ]
+}"""
 
 MOCK_PWHOIS_RESPONSE_COUNT = 4
 

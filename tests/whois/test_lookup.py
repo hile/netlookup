@@ -37,8 +37,8 @@ def validate_empty_address_lookup_cache(whois: WhoisLookup) -> None:
     # pylint: disable=use-implicit-booleaness-not-comparison
     assert whois.__unmapped_fields__ == {}
 
-    assert whois.match('1.2.3.4') is None
-    assert whois.match(IPAddress('1.2.3.4')) is None
+    assert whois.match(MOCK_WHOIS_QUERY_ADDRESS) is None
+    assert whois.match(IPAddress(MOCK_WHOIS_QUERY_ADDRESS)) is None
 
     # pylint: disable=use-implicit-booleaness-not-comparison
     assert whois.filter_keys('test_key') == []
@@ -190,5 +190,6 @@ def test_whois_address_lookup_address_success(mock_whois_default_cache, mock_who
     assert mock_whois_address_query.call_count == 1
     assert response.__query__ == MOCK_WHOIS_QUERY_ADDRESS
     assert response.__query_type__ == WhoisQueryType.ADDRESS
+    print(response)
     assert whois.query(MOCK_WHOIS_QUERY_ADDRESS) == response
     assert mock_whois_address_query.call_count == 1

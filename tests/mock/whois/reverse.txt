@@ -4,13 +4,13 @@
 
 refer:        whois.apnic.net
 
-inetnum:      1.0.0.0 - 1.255.255.255
+inetnum:      103.0.0.0 - 103.255.255.255
 organisation: APNIC
 status:       ALLOCATED
 
 whois:        whois.apnic.net
 
-changed:      2010-01
+changed:      2011-02
 source:       IANA
 
 # whois.apnic.net
@@ -18,52 +18,118 @@ source:       IANA
 % [whois.apnic.net]
 % Whois data copyright terms    http://www.apnic.net/db/dbcopyright.html
 
-% Information related to '1.2.3.0 - 1.2.3.255'
+% Information related to '103.102.250.0 - 103.102.250.255'
 
-% Abuse contact for '1.2.3.0 - 1.2.3.255' is 'abuse@apnic.net'
+% Abuse contact for '103.102.250.0 - 103.102.250.255' is 'abuse@serangkota.go.id'
 
-inetnum:        1.2.3.0 - 1.2.3.255
-netname:        Debogon-prefix
-descr:          APNIC Debogon Project
-descr:          APNIC Pty Ltd
-country:        AU
-admin-c:        AR302-AP
-tech-c:         AR302-AP
-mnt-by:         APNIC-HM
-mnt-routes:     MAINT-AU-APNIC-GM85-AP
-mnt-irt:        IRT-APNICRANDNET-AU
+inetnum:        103.102.250.0 - 103.102.250.255
+netname:        IDNIC-KOMINFO-SERANG-KOTA-ID
+descr:          DINAS KOMUNIKASI DAN INFORMATIKA KOTA SERANG
+descr:          Government / Direct member IDNIC
+descr:          Jl. Jendral Sudirman
+descr:          Kota Serang - Banten
+admin-c:        AH715-AP
+tech-c:         AH715-AP
+country:        ID
+mnt-by:         MNT-APJII-ID
+mnt-irt:        IRT-KOMINFO-SERANG-KOTA-ID
+mnt-routes:     MAINT-ID-KOMINFOSERANGKOTA
 status:         ASSIGNED PORTABLE
-last-modified:  2011-09-22T03:42:30Z
+last-modified:  2017-10-25T10:41:36Z
 source:         APNIC
 
-irt:            IRT-APNICRANDNET-AU
-address:        PO Box 3646
-address:        South Brisbane, QLD 4101
-address:        Australia
-e-mail:         abuse@apnic.net
-abuse-mailbox:  abuse@apnic.net
-admin-c:        AR302-AP
-tech-c:         AR302-AP
+irt:            IRT-KOMINFO-SERANG-KOTA-ID
+address:        DINAS KOMUNIKASI DAN INFORMATIKA KOTA SERANG
+address:        Jl. Jendral Sudirman
+address:        Kota Serang - Banten
+e-mail:         admin@serangkota.go.id
+abuse-mailbox:  abuse@serangkota.go.id
+admin-c:        AH715-AP
+tech-c:         AH715-AP
 auth:           # Filtered
-mnt-by:         MAINT-AU-APNIC-GM85-AP
-last-modified:  2011-09-22T03:53:02Z
+mnt-by:         MAINT-ID-KOMINFOSERANGKOTA
+last-modified:  2018-05-31T22:31:49Z
 source:         APNIC
 
-role:           APNIC RESEARCH
-address:        PO Box 3646
-address:        South Brisbane, QLD 4101
-address:        Australia
-country:        AU
-phone:          +61-7-3858-3188
-fax-no:         +61-7-3858-3199
-e-mail:         research@apnic.net
-nic-hdl:        AR302-AP
-tech-c:         AH256-AP
-admin-c:        AH256-AP
-mnt-by:         MAINT-APNIC-AP
-last-modified:  2018-04-04T04:26:04Z
+person:         Ahdi Haikal
+address:        DINAS KOMUNIKASI DAN INFORMATIKA KOTA SERANG
+address:        Jl. Jendral Sudirman
+address:        Kota Serang
+country:        ID
+phone:          +62-254-267116
+e-mail:         ahdihaikal@serangkota.go.id
+nic-hdl:        AH715-AP
+mnt-by:         MNT-APJII-ID
+last-modified:  2017-10-25T10:24:20Z
 source:         APNIC
 
-% This query was served by the APNIC Whois Service version 1.88.15-SNAPSHOT (WHOIS-UK3)
+% Information related to '103.102.250.0/24AS136862'
+
+route:          103.102.250.0/24
+descr:          Route Object of DINAS KOMUNIKASI DAN INFORMATIKA KOTA SERANG
+descr:          Government / Direct member IDNIC
+descr:          Jl. Jendral Sudirman
+descr:          Kota Serang - Banten
+origin:         AS136862
+mnt-by:         MAINT-ID-KOMINFOSERANGKOTA
+last-modified:  2018-01-22T10:52:54Z
+source:         APNIC
+
+% Information related to '103.102.250.0 - 103.102.250.255'
+
+inetnum:        103.102.250.0 - 103.102.250.255
+netname:        IDNIC-KOMINFO-SERANG-KOTA-ID
+descr:          DINAS KOMUNIKASI DAN INFORMATIKA KOTA SERANG
+descr:          Government / Direct member IDNIC
+descr:          Jl. Jendral Sudirman
+descr:          Kota Serang - Banten
+admin-c:        AH715-AP
+tech-c:         AH715-AP
+country:        ID
+mnt-by:         MNT-APJII-ID
+mnt-irt:        IRT-KOMINFO-SERANG-KOTA-ID
+mnt-routes:     MAINT-ID-KOMINFOSERANGKOTA
+status:         ASSIGNED PORTABLE
+last-modified:  2017-10-25T10:41:36Z
+source:         IDNIC
+
+irt:            IRT-KOMINFO-SERANG-KOTA-ID
+address:        DINAS KOMUNIKASI DAN INFORMATIKA KOTA SERANG
+address:        Jl. Jendral Sudirman
+address:        Kota Serang - Banten
+e-mail:         admin@serangkota.go.id
+abuse-mailbox:  abuse@serangkota.go.id
+admin-c:        AH715-AP
+tech-c:         AH715-AP
+auth:           # Filtered
+mnt-by:         MAINT-ID-KOMINFOSERANGKOTA
+last-modified:  2017-10-25T10:34:43Z
+source:         IDNIC
+
+person:         Ahdi Haikal
+address:        DINAS KOMUNIKASI DAN INFORMATIKA KOTA SERANG
+address:        Jl. Jendral Sudirman
+address:        Kota Serang
+country:        ID
+phone:          +62-254-267116
+e-mail:         ahdihaikal@serangkota.go.id
+nic-hdl:        AH715-AP
+mnt-by:         MNT-APJII-ID
+last-modified:  2017-10-25T10:24:20Z
+source:         IDNIC
+
+% Information related to '103.102.250.0/24AS136862'
+
+route:          103.102.250.0/24
+descr:          Route Object of DINAS KOMUNIKASI DAN INFORMATIKA KOTA SERANG
+descr:          Government / Direct member IDNIC
+descr:          Jl. Jendral Sudirman
+descr:          Kota Serang - Banten
+origin:         AS136862
+mnt-by:         MAINT-ID-KOMINFOSERANGKOTA
+last-modified:  2018-01-22T10:52:54Z
+source:         IDNIC
+
+% This query was served by the APNIC Whois Service version 1.88.16 (WHOIS-UK4)
 
 
