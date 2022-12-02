@@ -171,8 +171,9 @@ class PrefixLookupResponse(BaseQueryResponse):
         Query pwhois cache for response
         """
         try:
+            print('run pwhois query', *('whois', str(query)))
             stdout, stderr = run_command_lineoutput(
-                *('whois', str(query)),
+                *('whois', '-h', 'whois.pwhois.org', str(query)),
                 encodings=LINE_ENCODINGS,
                 timeout=QUERY_TIMEOUT
             )
@@ -186,16 +187,22 @@ class PrefixLookupResponse(BaseQueryResponse):
         Return data as dictionary
         """
         return {
-            'networks': self.networks,
+            'groups': self.groups,
         }
 
     def as_json(self):
         """
-        Return prefix whois query result as JSON
+        Return whois query result as JSON
         """
-        response = {
-            'networks': self.networks
-        }
+        response = {}
+        for group in self.groups:
+            for key, value in group.as_dict().items():
+                if key not in response:
+                    response[key] = value
+                elif not isinstance(response[key], list):
+                    response[key] = [response[key]] + [value]
+                else:
+                    response[key].append(value)
         return json.dumps(response, indent=2, cls=NetworkDataEncoder)
 
 

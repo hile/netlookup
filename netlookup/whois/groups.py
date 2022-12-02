@@ -187,6 +187,78 @@ class InformationSectionGroup(dict):
         }
 
 
+class AsHandle(InformationSectionGroup):
+    """
+    AS handle in prefix whois data
+    """
+    __groups__ = (
+        'as_handle',
+    )
+
+
+class AsOriginHandle(InformationSectionGroup):
+    """
+    AS origin handle in prefix whois data
+    """
+    __groups__ = (
+        'origin_as',
+    )
+
+
+class AsName(InformationSectionGroup):
+    """
+    AS name in prefix whois data
+    """
+    __groups__ = (
+        'as_name',
+    )
+
+
+class AsPath(InformationSectionGroup):
+    """
+    AS path in prefix whois data
+    """
+    __groups__ = (
+        'as_path',
+    )
+
+
+class AsCreated(InformationSectionGroup):
+    """
+    AS creation date in prefix whois data
+    """
+    __groups__ = (
+        'as_create_date',
+    )
+
+
+class IP(InformationSectionGroup):
+    """
+    IP address in prefix whois data
+    """
+    __groups__ = (
+        'ip',
+    )
+
+
+class Prefix(InformationSectionGroup):
+    """
+    Prefix in prefix whois data
+    """
+    __groups__ = (
+        'route_prefix',
+    )
+
+
+class RoutePrefix(InformationSectionGroup):
+    """
+    Route prefix in prefix whois data
+    """
+    __groups__ = (
+        'route_prefix',
+    )
+
+
 class AddressMappedItem(InformationSectionGroup):
     """
     Item with address details
@@ -550,6 +622,11 @@ class WhoisServer(InformationSectionGroup):
 
 
 GROUP_LOADERS = (
+    AsCreated,
+    AsHandle,
+    AsName,
+    AsPath,
+    AsOriginHandle,
     Changed,
     ContactPerson,
     Contacts,
@@ -560,11 +637,13 @@ GROUP_LOADERS = (
     IncidentResponseTeam,
     Inet6Num,
     InetNum,
+    IP,
     Nameservers,
     NetworkRange,
     NicHandle,
     Organization,
     OrganizationContact,
+    Prefix,
     ReferralServer,
     Registrar,
     Remarks,
@@ -572,5 +651,6 @@ GROUP_LOADERS = (
     Role,
     Route,
     Route6,
+    RoutePrefix,
     WhoisServer,
 )

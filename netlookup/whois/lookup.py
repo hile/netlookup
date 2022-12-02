@@ -54,6 +54,20 @@ class QueryLookupCache(LoggingBaseClass):
             for response in self.__responses__
         ]
 
+    def __is_response_valid__(self, response, max_age: Optional[float] = None) -> bool:
+        """
+        Check response __loaded__ attribute is defined and not outdated based on the
+        max_age (float seconds) value
+        """
+        time_limit = None
+        if response.__loaded__ is None:
+            return False
+        if max_age is not None:
+            time_limit = (datetime.now() - timedelta(seconds=max_age)).timestamp()
+            if response.__loaded__ < time_limit:
+                return False
+        return True
+
     @property
     def __default_cache_file__(self):
         return None
@@ -159,16 +173,8 @@ class PrefixLookup(QueryLookupCache):
         """
         Match a cached prefix lookup value
         """
-        time_limit = None
-        if max_age is not None:
-            time_limit = (datetime.now() - timedelta(seconds=max_age)).timestamp()
-
         for response in self.__responses__:
-            if not response.__loaded__:
-                continue
-            if time_limit is not None and response.__loaded__ < time_limit:
-                continue
-            if response.match(value):
+            if self.__is_response_valid__(response, max_age):
                 return response
         return None
 
@@ -186,6 +192,8 @@ class PrefixLookup(QueryLookupCache):
             silent=self.__setattr__
         )
         response.query(value)
+        if not response.groups:
+            raise WhoisQueryError('Prefix whis query returns no data')
         self.__responses__.append(response)
         try:
             self.write_cache()

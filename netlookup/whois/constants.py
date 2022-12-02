@@ -3,16 +3,24 @@ Constants for whois lookups
 """
 from enum import Enum
 
+PREFIX_WHOIS_SERVER = 'whois.pwhois.org'
 
 RESPONSE_MAX_AGE_SECONDS = 86400
 
 DATE_FIELDS = (
+    'as_create_date',
+    'as_modify_date',
+    'as_register_date',
+    'as_update_date',
+    'create_date',
     'creation_date',
     'expiry_date',
     'last_update',
     'last_updated',
+    'modify_date',
     'modified',
     'nslastaa',
+    'originated_date',
     'registered',
     'reg_date',
     'registry_expiry_date',
@@ -40,9 +48,12 @@ NETWORK_FIELDS = (
     'inetnum',
     'inet6num',
     'inetnum_up',
+    'ip',
     'net_range',
+    'prefix',
     'reverse_route',
     'route',
+    'route_prefix',
 )
 
 ORGANIZATION_FIELDS = (
@@ -68,6 +79,22 @@ GLOBAL_FIELD_MAP = {
     'admin_c': {
         'field': 'admin_contact',
         'description': 'Admin Contact',
+    },
+    'as_handle': {
+        'field': 'as_handle',
+        'description': 'AS Handle',
+    },
+    'as_name': {
+        'field': 'as_name',
+        'description': 'AS Name',
+    },
+    'as_org_id': {
+        'field': 'as_org_id',
+        'description': 'AS Organization ID',
+    },
+    'as_org_name': {
+        'field': 'as_org_name',
+        'description': 'AS Organization Name',
     },
     'billing_c': {
         'field': 'billing_contact',
@@ -247,6 +274,7 @@ GLOBAL_FIELD_ALIASES = {
         'r_abuse_email',
     ),
     'handle': (
+        'as_handle',
         'org_abuse_handle',
         'org_noc_handle',
         'org_routing_handle',
@@ -256,6 +284,9 @@ GLOBAL_FIELD_ALIASES = {
         'r_abuse_handle',
     ),
     'name': (
+        'as_org_id',
+        'as_name',
+        'as_org_name',
         'person',
         'org_abuse_name',
         'org_noc_name',
