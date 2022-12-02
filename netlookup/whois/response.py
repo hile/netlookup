@@ -16,7 +16,7 @@ from sys_toolkit.subprocess import run_command_lineoutput
 from ..encoders import NetworkDataEncoder
 from ..exceptions import WhoisQueryError
 
-from .constants import ORGANIZATION_FIELDS, WhoisQueryType
+from .constants import PREFIX_WHOIS_SERVER, ORGANIZATION_FIELDS, WhoisQueryType
 from .groups import InformationSectionGroup, GROUP_LOADERS
 from .utils import parse_field_value
 
@@ -173,7 +173,7 @@ class PrefixLookupResponse(BaseQueryResponse):
         try:
             print('run pwhois query', *('whois', str(query)))
             stdout, stderr = run_command_lineoutput(
-                *('whois', '-h', 'whois.pwhois.org', str(query)),
+                *('whois', '-h', PREFIX_WHOIS_SERVER, str(query)),
                 encodings=LINE_ENCODINGS,
                 timeout=QUERY_TIMEOUT
             )
