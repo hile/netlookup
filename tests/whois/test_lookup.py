@@ -7,7 +7,7 @@ from netaddr.ip import IPAddress
 
 from netlookup.exceptions import WhoisQueryError
 from netlookup.whois import PrefixLookup, WhoisLookup
-from netlookup.whois.constants import WhoisQueryType
+from netlookup.whois.constants import WhoisQueryType, RESPONSE_MAX_AGE_SECONDS
 from netlookup.whois.lookup import QueryLookupCache, PREFIX_CACHE_FILE, WHOIS_CACHE_FILE
 from netlookup.whois.response import PrefixLookupResponse, WhoisLookupResponse
 
@@ -15,6 +15,7 @@ from ..conftest import MOCK_WHOIS_CACHE_RESPONSE_COUNT
 from .constants import (
     MOCK_PWHOIS_RESPONSE_COUNT,
     MOCK_PWHOIS_QUERY_ADDRESS,
+    MOCK_PWHOIS_QUERY_MATCH,
     MOCK_WHOIS_QUERY_ADDRESS,
     MOCK_WHOIS_QUERY_DOMAIN,
 )
@@ -183,7 +184,7 @@ def test_whois_address_lookup_expired_cache_file(
 
 
 # pylint: disable=unused-argument
-def test_prefix_address_lookup_cache_file(
+def test_whois_prefix_lookup_cache_file(
         mock_whois_query_no_data,
         mock_whois_lookup_cache,
         mock_prefix_lookup_cache):
@@ -291,3 +292,34 @@ def test_whois_address_lookup_filter_keys(mock_whois_lookup_cache):
     matches = mock_whois_lookup_cache.filter_keys('inetnum')
     print(len(matches), len(mock_whois_lookup_cache.__responses__))
     assert len(matches) == MOCK_INETNUM_KEY_MATCH_COUNT
+
+
+def test_whois_prefix_lookup_match_found(mock_prefix_lookup_cache):
+    """
+    Test match() method of prefix lookup when a match is found
+    """
+    response = mock_prefix_lookup_cache.match(MOCK_PWHOIS_QUERY_MATCH)
+    assert isinstance(response, PrefixLookupResponse)
+
+
+def test_whois_prefix_lookup_match_expired(mock_prefix_lookup_cache_expired):
+    """
+    Test match() method of prefix lookup when a match is found
+    """
+    response = mock_prefix_lookup_cache_expired.match(
+        MOCK_PWHOIS_QUERY_MATCH,
+        max_age=RESPONSE_MAX_AGE_SECONDS
+    )
+    assert response is None
+
+    # Default max_age is None for match() method
+    response = mock_prefix_lookup_cache_expired.match(MOCK_PWHOIS_QUERY_MATCH)
+    assert isinstance(response, PrefixLookupResponse)
+
+
+def test_whois_prefix_lookup_query_expired_no_data(mock_prefix_lookup_cache_expired, mock_whois_query_no_data):
+    """
+    Test query() method of prefix lookup when cache is expired and no data is received from server
+    """
+    with pytest.raises(WhoisQueryError):
+        mock_prefix_lookup_cache_expired.query(MOCK_PWHOIS_QUERY_MATCH)

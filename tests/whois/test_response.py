@@ -13,7 +13,6 @@ from .constants import (
     MOCK_WHOIS_QUERY_DOMAIN,
     MOCK_PWHOIS_QUERY_ADDRESS,
     MOCK_PWHOIS_QUERY_MATCH,
-    MOCK_PWHOIS_QUERY_MATCH_NETWORKS,
     MOCK_PWHOIS_QUERY_RESPONSE_AS_JSON,
 )
 
@@ -107,8 +106,8 @@ def test_prefix_lookup_response_empty_response_properties():
 
     assert obj.match(MOCK_PWHOIS_QUERY_ADDRESS) is False
 
-    assert obj.as_dict() == {'networks': []}
-    assert obj.as_json() == '{\n  "networks": []\n}'
+    assert obj.as_dict() == {'groups': []}
+    assert obj.as_json() == '{}'
 
 
 # pylint: disable=unused-argument
@@ -120,11 +119,10 @@ def test_prefix_lookup_response_valid_response_properties(
     Test properties of an valid PrefixLookupResponse objet
     """
     obj = mock_prefix_lookup_cache.match(MOCK_PWHOIS_QUERY_MATCH)
-    print(vars(obj))
     assert isinstance(obj.__repr__(), str)
 
     assert obj.match(MOCK_PWHOIS_QUERY_MATCH) is True
 
-    print(MOCK_PWHOIS_QUERY_ADDRESS, obj, obj.networks)
-    assert obj.as_dict() == {'networks': MOCK_PWHOIS_QUERY_MATCH_NETWORKS}
+    print(obj.as_json())
+    assert isinstance(obj.as_dict(), dict)
     assert obj.as_json() == MOCK_PWHOIS_QUERY_RESPONSE_AS_JSON
