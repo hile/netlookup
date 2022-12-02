@@ -151,7 +151,7 @@ def test_prefix_address_lookup_cache_file(
 
 def test_whois_address_lookup_cache_write(mock_whois_default_cache) -> None:
     """
-    Test properties of a WhoisLookup with empty query cache
+    Test writing whois lookup cache file
     """
     assert not mock_whois_default_cache.exists()
     whois = WhoisLookup()
@@ -164,6 +164,30 @@ def test_whois_address_lookup_cache_write(mock_whois_default_cache) -> None:
 
     whois.write_cache()
     assert whois.cache_file.exists()
+
+
+def test_whois_address_lookup_cache_write_readonly_error(
+        capsys,
+        mock_whois_default_cache_readonly,
+        mock_whois_domain_query) -> None:
+    """
+    Test writing whois lookup cache file when cache file is readonly and write failss
+    """
+    assert not mock_whois_default_cache_readonly.exists()
+    whois = WhoisLookup()
+    with pytest.raises(WhoisQueryError):
+        whois.write_cache()
+
+    # Query writes error message to stderr when cache can't be written but does not fail
+    whois.__debug_enabled__ = True
+    response = whois.query(MOCK_WHOIS_QUERY_ADDRESS)
+    assert isinstance(response, WhoisLookupResponse)
+    captured = capsys.readouterr()
+    debug = captured.err.splitlines()
+    # Also contains debug prints from query
+    assert len(debug) > 1
+    prefix = f'error updating cache file {whois.cache_file}'
+    assert debug[-1][:len(prefix)] == prefix
 
 
 # pylint: disable=unused-argument

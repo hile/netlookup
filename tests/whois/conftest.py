@@ -24,6 +24,7 @@ from .constants import (
 MOCK_ADDRESS_LIST_FILE = MOCK_DATA.joinpath('whois/addresses.txt')
 MOCK_QUERY_DOMAIN_FILE = MOCK_DATA.joinpath('whois/domain.txt')
 MOCK_QUERY_REVERSE_FILE = MOCK_DATA.joinpath('whois/reverse.txt')
+MOCK_PWHOIS_QUERY_CACHE_FILE = MOCK_DATA.joinpath('whois/pwhois_cache.json')
 
 
 def mock_whois_query_response_data(monkeypatch, path: Path) -> str:
@@ -59,6 +60,18 @@ def mock_whois_default_cache(monkeypatch, tmpdir):
     Generate an empty whois query response cache
     """
     cache_file = Path(tmpdir.strpath, 'config/whois.cache')
+    monkeypatch.setattr('netlookup.whois.lookup.WHOIS_CACHE_FILE', cache_file)
+    yield cache_file
+
+
+@pytest.fixture
+def mock_whois_default_cache_readonly(monkeypatch, tmpdir):
+    """
+    Generate an empty whois query response cache with unwritable directory
+    """
+    cache_file = Path(tmpdir.strpath, 'config/whois.cache')
+    cache_file.parent.mkdir(parents=True)
+    cache_file.parent.chmod(int('0555', 8))
     monkeypatch.setattr('netlookup.whois.lookup.WHOIS_CACHE_FILE', cache_file)
     yield cache_file
 

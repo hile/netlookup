@@ -74,10 +74,13 @@ class QueryLookupCache(LoggingBaseClass):
             raise WhoisQueryError('Cache file is not defined')
         if not self.cache_file.parent.is_dir():
             self.cache_file.parent.mkdir(parents=True)
-        with self.cache_file.open('w') as filedescriptor:
-            filedescriptor.write(
-                json.dumps(self.__format_json_data__(), indent=2, cls=NetworkDataEncoder)
-            )
+        try:
+            with self.cache_file.open('w') as filedescriptor:
+                filedescriptor.write(
+                    json.dumps(self.__format_json_data__(), indent=2, cls=NetworkDataEncoder)
+                )
+        except PermissionError as error:
+            raise WhoisQueryError(f'Error writing query cache file: {error}') from error
 
     def match(self, value, max_age=None):
         """

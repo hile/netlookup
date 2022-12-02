@@ -258,14 +258,6 @@ class WhoisLookupResponse(BaseQueryResponse):
                 raise WhoisQueryError(f'invalid whois query {query}')
         return WhoisQueryType.DOMAIN.value
 
-    def __load_data__(self, stdout, stderr, query_type=None, loaded_timestamp=None):
-        """
-        Load data from response
-        """
-        super().__load_data__(stdout, stderr, query_type, loaded_timestamp)
-        if self.__query_type__ is None:
-            self.__query_type__ = WhoisQueryType.ADDRESS if self.address_ranges else WhoisQueryType.DOMAIN
-
     def query(self, query):
         """
         Run whois query for query value
