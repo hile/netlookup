@@ -208,26 +208,6 @@ class NetworkObject(InformationSectionGroup):
         }
     }
 
-    def format_field_as_dict(self, key):
-        """
-        Format fields as dictionary
-        """
-        value = self[key]
-        if isinstance(value, IPRange):
-            return 'network_range', {
-                'address_range': value,
-                'networks': value.cidrs(),
-                'description': 'Network Range',
-                'size': value.size,
-            }
-        if isinstance(value, IPNetwork):
-            return 'network', {
-                'cidr': value,
-                'description': 'Network',
-                'size': value.size,
-            }
-        return super().format_field_as_dict(key)
-
 
 class Changed(AddressMappedItem):
     """
