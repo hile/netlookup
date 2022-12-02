@@ -100,12 +100,14 @@ class InformationSectionGroup(dict):
         """
         for value in values:
             if isinstance(value, IPRange):
-                self.address_ranges.append(value)
+                if value not in self.address_ranges:
+                    self.address_ranges.append(value)
                 for network in value.cidrs():
                     if network not in self.networks:
                         self.networks.append(network)
             if isinstance(value, IPNetwork):
-                self.networks.append(value)
+                if value not in self.networks:
+                    self.networks.append(value)
 
     # pylint: disable=too-many-branches
     def parse_value(self, field, value):

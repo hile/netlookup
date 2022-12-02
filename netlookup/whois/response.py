@@ -69,7 +69,7 @@ class BaseQueryResponse(LoggingBaseClass):
         try:
             group = loader(self, line)
         except WhoisQueryError as error:
-            self.debug(error)
+            self.debug(f'Error parsing output line {line}: {error}')
             return None, is_label
         self.groups.append(group)
         return group, is_label

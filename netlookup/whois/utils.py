@@ -94,11 +94,14 @@ def parse_network_value(value) -> List[Union[IPNetwork, IPRange]]:
     Parse IP range or IP network values
     """
     try:
-        start, end = [arg.strip() for arg in value.split(' - ', 1)]
-        try:
-            return [IPRange(start, end)]
-        except (AddrFormatError, ValueError) as error:
-            raise WhoisQueryError(f'Error parsing network field value {value}: {error}') from error
+        ipranges = []
+        for iprange in value.split(','):
+            start, end = [arg.strip() for arg in iprange.split(' - ', 1)]
+            try:
+                ipranges.append(IPRange(start, end))
+            except (AddrFormatError, ValueError) as error:
+                raise WhoisQueryError(f'Error parsing IP range value {value}: {error}') from error
+        return ipranges
     except ValueError:
         pass
 
