@@ -2,7 +2,7 @@
 Utilities for whois lookups
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Union
 import re
 
@@ -26,19 +26,19 @@ def parse_datetime(value):
 
     date = value
     if isinstance(value, (int, float)):
-        return datetime.fromtimestamp(value)
+        return datetime.fromtimestamp(value).astimezone(timezone.utc)
 
     if date.endswith('Z'):
         date = f'{date[:-1]}+00:00'
 
     try:
-        return datetime.fromisoformat(date)
+        return datetime.fromisoformat(date).astimezone(timezone.utc)
     except ValueError:
         pass
 
     for datetime_format in DATETIME_FORMATS:
         try:
-            return datetime.strptime(date, datetime_format)
+            return datetime.strptime(date, datetime_format).astimezone(timezone.utc)
         except ValueError:
             pass
     raise WhoisQueryError(f'Error parsing datetime value {value}')
