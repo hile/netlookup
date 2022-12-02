@@ -137,6 +137,8 @@ def test_whois_domain_lookup_expired_cache_file(
     Mock whois cache lookup for address when all cache items are expired
     """
     whois = mock_whois_lookup_cache_expired
+    # Item is not valid (expired)
+    assert whois.match(MOCK_WHOIS_QUERY_DOMAIN, max_age=30) is None
     # Known address but the response is marked as expired, must query again
     response = whois.query(MOCK_WHOIS_QUERY_DOMAIN)
     assert isinstance(response, WhoisLookupResponse)
@@ -151,6 +153,8 @@ def test_whois_domain_lookup_unloaded_cache_file(
     none)
     """
     whois = mock_whois_lookup_cache_unloaded
+    # Item is not valid (unloaded)
+    assert whois.match(MOCK_WHOIS_QUERY_DOMAIN, max_age=30) is None
     # Known address but the response is marked as expired, must query again
     response = whois.query(MOCK_WHOIS_QUERY_DOMAIN)
     assert isinstance(response, WhoisLookupResponse)
@@ -292,6 +296,18 @@ def test_whois_address_lookup_filter_keys(mock_whois_lookup_cache):
     matches = mock_whois_lookup_cache.filter_keys('inetnum')
     print(len(matches), len(mock_whois_lookup_cache.__responses__))
     assert len(matches) == MOCK_INETNUM_KEY_MATCH_COUNT
+
+
+def test_whois_prefix_lookup_query_empty_cache(
+        empty_prefix_lookup_query_cache,
+        mock_prefix_lookup_query):
+    """
+    Test query() method of prefix lookup when a match is found
+    """
+    assert len(empty_prefix_lookup_query_cache.__responses__) == 0
+    assert empty_prefix_lookup_query_cache.match(MOCK_PWHOIS_QUERY_MATCH) is None
+    response = empty_prefix_lookup_query_cache.query(MOCK_PWHOIS_QUERY_MATCH)
+    assert isinstance(response, PrefixLookupResponse)
 
 
 def test_whois_prefix_lookup_match_found(mock_prefix_lookup_cache):

@@ -7,7 +7,7 @@ import pytest
 
 from sys_toolkit.tests.mock import MockRunCommandLineOutput
 
-from netlookup.whois.lookup import WhoisLookup
+from netlookup.whois.lookup import PrefixLookup, WhoisLookup
 from netlookup.whois.response import WhoisLookupResponse
 
 from ..conftest import MOCK_DATA
@@ -23,6 +23,7 @@ from .constants import (
 
 MOCK_ADDRESS_LIST_FILE = MOCK_DATA.joinpath('whois/addresses.txt')
 MOCK_QUERY_DOMAIN_FILE = MOCK_DATA.joinpath('whois/domain.txt')
+MOCK_QUERY_PWHOIS_FILE = MOCK_DATA.joinpath('whois/pwhois.txt')
 MOCK_QUERY_REVERSE_FILE = MOCK_DATA.joinpath('whois/reverse.txt')
 MOCK_PWHOIS_QUERY_CACHE_FILE = MOCK_DATA.joinpath('whois/pwhois_cache.json')
 
@@ -42,6 +43,15 @@ def mock_whois_query_response_data(monkeypatch, path: Path) -> str:
 
 
 @pytest.fixture
+def mock_prefix_lookup_query(monkeypatch):
+    """
+    Mock prefix lookup query response for MOCK_PWHOIS_QUERY_MATCH address query
+    """
+    mock_method = mock_whois_query_response_data(monkeypatch, MOCK_QUERY_PWHOIS_FILE)
+    return mock_method
+
+
+@pytest.fixture
 def mock_whois_address_query(monkeypatch):
     """
     Mock whois query response for MOCK_WHOIS_QUERY_DOMAIN address query
@@ -57,6 +67,16 @@ def mock_whois_domain_query(monkeypatch):
     """
     mock_method = mock_whois_query_response_data(monkeypatch, MOCK_QUERY_DOMAIN_FILE)
     return mock_method
+
+
+@pytest.fixture
+def mock_prefix_default_cache_file(monkeypatch, tmpdir):
+    """
+    Generate an empty prefix lookup query response cache
+    """
+    cache_file = Path(tmpdir.strpath, 'config/pwhois.cache')
+    monkeypatch.setattr('netlookup.whois.lookup.PREFIX_CACHE_FILE', cache_file)
+    yield cache_file
 
 
 @pytest.fixture
@@ -79,6 +99,15 @@ def mock_whois_default_cache_readonly(monkeypatch, tmpdir):
     cache_file.parent.chmod(int('0555', 8))
     monkeypatch.setattr('netlookup.whois.lookup.WHOIS_CACHE_FILE', cache_file)
     yield cache_file
+
+
+# pylint: disable=redefined-outer-name
+@pytest.fixture
+def empty_prefix_lookup_query_cache(mock_prefix_default_cache_file):
+    """
+    Generate an empty prefix lookup query response cache
+    """
+    yield PrefixLookup(cache_file=mock_prefix_default_cache_file)
 
 
 # pylint: disable=redefined-outer-name
