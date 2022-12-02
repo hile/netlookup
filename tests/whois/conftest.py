@@ -26,6 +26,11 @@ MOCK_QUERY_DOMAIN_FILE = MOCK_DATA.joinpath('whois/domain.txt')
 MOCK_QUERY_REVERSE_FILE = MOCK_DATA.joinpath('whois/reverse.txt')
 MOCK_PWHOIS_QUERY_CACHE_FILE = MOCK_DATA.joinpath('whois/pwhois_cache.json')
 
+# Number of domain lines in mock data
+MOCK_DOMAIN_KEY_MATCH_COUNT = 15
+# Number of inetnum lines in mock data
+MOCK_INETNUM_KEY_MATCH_COUNT = 270
+
 
 def mock_whois_query_response_data(monkeypatch, path: Path) -> str:
     """

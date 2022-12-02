@@ -18,6 +18,7 @@ from .constants import (
     MOCK_WHOIS_QUERY_ADDRESS,
     MOCK_WHOIS_QUERY_DOMAIN,
 )
+from .conftest import MOCK_DOMAIN_KEY_MATCH_COUNT, MOCK_INETNUM_KEY_MATCH_COUNT
 
 
 def validate_empty_address_lookup_cache(whois: WhoisLookup) -> None:
@@ -128,6 +129,59 @@ def test_whois_address_lookup_cache_file(
     assert isinstance(res, WhoisLookupResponse)
 
 
+def test_whois_domain_lookup_expired_cache_file(
+        mock_whois_domain_query,
+        mock_whois_lookup_cache_expired):
+    """
+    Mock whois cache lookup for address when all cache items are expired
+    """
+    whois = mock_whois_lookup_cache_expired
+    # Known address but the response is marked as expired, must query again
+    response = whois.query(MOCK_WHOIS_QUERY_DOMAIN)
+    assert isinstance(response, WhoisLookupResponse)
+    assert mock_whois_domain_query.call_count == 1
+
+
+def test_whois_domain_lookup_unloaded_cache_file(
+        mock_whois_domain_query,
+        mock_whois_lookup_cache_unloaded):
+    """
+    Mock whois cache lookup for address when all cache items are unloaded (load timestamp is
+    none)
+    """
+    whois = mock_whois_lookup_cache_unloaded
+    # Known address but the response is marked as expired, must query again
+    response = whois.query(MOCK_WHOIS_QUERY_DOMAIN)
+    assert isinstance(response, WhoisLookupResponse)
+    assert mock_whois_domain_query.call_count == 1
+
+
+def test_whois_address_lookup_unloaded_cache_file(
+        mock_whois_address_query,
+        mock_whois_lookup_cache_unloaded):
+    """
+    Mock whois cache lookup for address when all cache items are unloaded
+    """
+    whois = mock_whois_lookup_cache_unloaded
+    # Known address but the response is marked as expired, must query again
+    response = whois.query(MOCK_WHOIS_QUERY_ADDRESS)
+    assert isinstance(response, WhoisLookupResponse)
+    assert mock_whois_address_query.call_count == 1
+
+
+def test_whois_address_lookup_expired_cache_file(
+        mock_whois_address_query,
+        mock_whois_lookup_cache_expired):
+    """
+    Mock whois cache lookup for address when all cache items are expired
+    """
+    whois = mock_whois_lookup_cache_expired
+    # Known address but the response is marked as expired, must query again
+    response = whois.query(MOCK_WHOIS_QUERY_ADDRESS)
+    assert isinstance(response, WhoisLookupResponse)
+    assert mock_whois_address_query.call_count == 1
+
+
 # pylint: disable=unused-argument
 def test_prefix_address_lookup_cache_file(
         mock_whois_query_no_data,
@@ -217,3 +271,23 @@ def test_whois_address_lookup_address_success(mock_whois_default_cache, mock_who
     print(response)
     assert whois.query(MOCK_WHOIS_QUERY_ADDRESS) == response
     assert mock_whois_address_query.call_count == 1
+
+
+# pylint: disable=unused-argument
+def test_whois_domain_lookup_filter_keys(mock_whois_lookup_cache):
+    """
+    Test filtering of items by group key from whois query cache
+    """
+    matches = mock_whois_lookup_cache.filter_keys('domain')
+    print(len(matches), len(mock_whois_lookup_cache.__responses__))
+    assert len(matches) == MOCK_DOMAIN_KEY_MATCH_COUNT
+
+
+# pylint: disable=unused-argument
+def test_whois_address_lookup_filter_keys(mock_whois_lookup_cache):
+    """
+    Test filtering of items by group key from whois query cache
+    """
+    matches = mock_whois_lookup_cache.filter_keys('inetnum')
+    print(len(matches), len(mock_whois_lookup_cache.__responses__))
+    assert len(matches) == MOCK_INETNUM_KEY_MATCH_COUNT

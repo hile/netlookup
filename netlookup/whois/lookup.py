@@ -6,6 +6,7 @@ import json
 
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Optional
 
 from netaddr.ip import IPAddress
 
@@ -163,16 +164,26 @@ class WhoisLookup(QueryLookupCache):
             self.__dns_lookup_table__[query] = response
         return response
 
-    def match(self, value, max_age=None):
+    def __is_response_valid__(self, response, max_age: Optional[float] = None) -> bool:
+        """
+        Check response __loaded__ attribute is defined and not outdated based on the
+        max_age (float seconds) value
+        """
+        time_limit = None
+        if response.__loaded__ is None:
+            return False
+        if max_age is not None:
+            time_limit = (datetime.now() - timedelta(seconds=max_age)).timestamp()
+            if response.__loaded__ < time_limit:
+                return False
+        return True
+
+    def match(self, value, max_age: Optional[float] = None):
         """
         Match value to existing responses
 
         Returns response section or None
         """
-        time_limit = None
-        if max_age is not None:
-            time_limit = (datetime.now() - timedelta(seconds=max_age)).timestamp()
-
         if not isinstance(value, IPAddress):
             try:
                 value = IPAddress(value)
@@ -180,12 +191,12 @@ class WhoisLookup(QueryLookupCache):
                 pass
 
         if value in self.__dns_lookup_table__:
-            return self.__dns_lookup_table__[value]
+            response = self.__dns_lookup_table__[value]
+            if self.__is_response_valid__(response, max_age):
+                return response
 
         for response in self.__responses__:
-            if not response.__loaded__:
-                continue
-            if time_limit is not None and response.__loaded__ < time_limit:
+            if not self.__is_response_valid__(response, max_age):
                 continue
             if response.match(value):
                 return response
