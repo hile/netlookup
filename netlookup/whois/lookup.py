@@ -193,7 +193,7 @@ class PrefixLookup(QueryLookupCache):
         )
         response.query(value)
         if not response.groups:
-            raise WhoisQueryError('Prefix whis query returns no data')
+            raise WhoisQueryError('Prefix whois query returns no data')
         self.__responses__.append(response)
         try:
             self.write_cache()
@@ -236,20 +236,6 @@ class WhoisLookup(QueryLookupCache):
         if query_type == WhoisQueryType.DOMAIN.value and query:
             self.__dns_lookup_table__[query] = response
         return response
-
-    def __is_response_valid__(self, response, max_age: Optional[float] = None) -> bool:
-        """
-        Check response __loaded__ attribute is defined and not outdated based on the
-        max_age (float seconds) value
-        """
-        time_limit = None
-        if response.__loaded__ is None:
-            return False
-        if max_age is not None:
-            time_limit = (datetime.now() - timedelta(seconds=max_age)).timestamp()
-            if response.__loaded__ < time_limit:
-                return False
-        return True
 
     def match(self, value, max_age: Optional[float] = None):
         """
