@@ -129,6 +129,71 @@ class QueryLookupCache(LoggingBaseClass):
             table.append(field)
 
 
+class PrefixLookup(QueryLookupCache):
+    """
+    Route prefix lookup from pwhois service
+    """
+    @property
+    def __default_cache_file__(self):
+        return PREFIX_CACHE_FILE
+
+    def __load_json_record__(self, record) -> PrefixLookupResponse:
+        """
+        Load a JSON record from cached data
+        """
+        query_type = record.get('query_type', None)
+        query = record.get('query', None)
+        loaded_timestamp = parse_datetime(record['loaded_timestamp']).timestamp()
+        stdout = record['lines']
+        response = PrefixLookupResponse(self, debug_enabled=self.__debug_enabled__, silent=self.__silent__)
+        response.__load_data__(
+            stdout=stdout,
+            stderr=[],
+            loaded_timestamp=loaded_timestamp,
+            query_type=query_type
+        )
+        response.__query__ = query
+        return response
+
+    def match(self, value, max_age=None):
+        """
+        Match a cached prefix lookup value
+        """
+        time_limit = None
+        if max_age is not None:
+            time_limit = (datetime.now() - timedelta(seconds=max_age)).timestamp()
+
+        for response in self.__responses__:
+            if not response.__loaded__:
+                continue
+            if time_limit is not None and response.__loaded__ < time_limit:
+                continue
+            if response.match(value):
+                return response
+        return None
+
+    def query(self, value, max_age=RESPONSE_MAX_AGE_SECONDS):
+        """
+        Query pwhois server for prefix informtation
+        """
+        response = self.match(value, max_age)
+        if response is not None:
+            return response
+
+        response = PrefixLookupResponse(
+            self,
+            debug_enabled=self.__debug_enabled__,
+            silent=self.__setattr__
+        )
+        response.query(value)
+        self.__responses__.append(response)
+        try:
+            self.write_cache()
+        except Exception as error:
+            self.debug(f'error updating cache file {self.cache_file}: {error}')
+        return response
+
+
 class WhoisLookup(QueryLookupCache):
     """
     Query whois for domain or IP address details
@@ -238,68 +303,3 @@ class WhoisLookup(QueryLookupCache):
                     self.debug(f'{group} {group[key]}')
                     matches.append(group[key])
         return matches
-
-
-class PrefixLookup(QueryLookupCache):
-    """
-    Route prefix lookup from pwhois service
-    """
-    @property
-    def __default_cache_file__(self):
-        return PREFIX_CACHE_FILE
-
-    def __load_json_record__(self, record) -> PrefixLookupResponse:
-        """
-        Load a JSON record from cached data
-        """
-        query_type = record.get('query_type', None)
-        query = record.get('query', None)
-        loaded_timestamp = parse_datetime(record['loaded_timestamp']).timestamp()
-        stdout = record['lines']
-        response = PrefixLookupResponse(self, debug_enabled=self.__debug_enabled__, silent=self.__silent__)
-        response.__load_data__(
-            stdout=stdout,
-            stderr=[],
-            loaded_timestamp=loaded_timestamp,
-            query_type=query_type
-        )
-        response.__query__ = query
-        return response
-
-    def match(self, value, max_age=None):
-        """
-        Match a cached prefix lookup value
-        """
-        time_limit = None
-        if max_age is not None:
-            time_limit = (datetime.now() - timedelta(seconds=max_age)).timestamp()
-
-        for response in self.__responses__:
-            if not response.__loaded__:
-                continue
-            if time_limit is not None and response.__loaded__ < time_limit:
-                continue
-            if response.match(value):
-                return response
-        return None
-
-    def query(self, value, max_age=RESPONSE_MAX_AGE_SECONDS):
-        """
-        Query pwhois server for prefix informtation
-        """
-        response = self.match(value, max_age)
-        if response is not None:
-            return response
-
-        response = PrefixLookupResponse(
-            self,
-            debug_enabled=self.__debug_enabled__,
-            silent=self.__setattr__
-        )
-        response.query(value)
-        self.__responses__.append(response)
-        try:
-            self.write_cache()
-        except Exception as error:
-            self.debug(f'error updating cache file {self.cache_file}: {error}')
-        return response
