@@ -310,6 +310,30 @@ def test_whois_prefix_lookup_query_empty_cache(
     assert isinstance(response, PrefixLookupResponse)
 
 
+def test_whois_prefix_lookup_query_cache_write_readonly_error(
+        capsys,
+        mock_prefix_lookup_default_cache_readonly,
+        mock_whois_domain_query) -> None:
+    """
+    Test writing whois lookup cache file when cache file is readonly and write failss
+    """
+    assert not mock_prefix_lookup_default_cache_readonly.exists()
+    prefix_lookup = PrefixLookup()
+    with pytest.raises(WhoisQueryError):
+        prefix_lookup.write_cache()
+
+    # Query writes error message to stderr when cache can't be written but does not fail
+    prefix_lookup.__debug_enabled__ = True
+    response = prefix_lookup.query(MOCK_PWHOIS_QUERY_MATCH)
+    assert isinstance(response, PrefixLookupResponse)
+    captured = capsys.readouterr()
+    debug = captured.err.splitlines()
+    # Also contains debug prints from query
+    assert len(debug) > 1
+    prefix = f'error updating cache file {prefix_lookup.cache_file}'
+    assert debug[-1][:len(prefix)] == prefix
+
+
 def test_whois_prefix_lookup_match_found(mock_prefix_lookup_cache):
     """
     Test match() method of prefix lookup when a match is found

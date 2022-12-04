@@ -110,6 +110,18 @@ def empty_prefix_lookup_query_cache(mock_prefix_default_cache_file):
     yield PrefixLookup(cache_file=mock_prefix_default_cache_file)
 
 
+@pytest.fixture
+def mock_prefix_lookup_default_cache_readonly(monkeypatch, tmpdir):
+    """
+    Generate an empty prefix lookup query response cache with unwritable directory
+    """
+    cache_file = Path(tmpdir.strpath, 'config/pwhois.cache')
+    cache_file.parent.mkdir(parents=True)
+    cache_file.parent.chmod(int('0555', 8))
+    monkeypatch.setattr('netlookup.whois.lookup.PREFIX_CACHE_FILE', cache_file)
+    yield cache_file
+
+
 # pylint: disable=redefined-outer-name
 @pytest.fixture
 def empty_whois_query_cache(mock_whois_default_cache):
