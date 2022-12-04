@@ -8,8 +8,9 @@ import re
 
 import inflection
 
-from netaddr.ip import IPNetwork, IPRange, AddrFormatError
+from netaddr.ip import IPAddress, IPNetwork, IPRange, AddrFormatError
 
+from ..constants import IPV4_VERSION, IPV6_VERSION, MAX_PREFIX_LEN_IPV4, MAX_PREFIX_LEN_IPV6
 from ..exceptions import WhoisQueryError
 from .constants import DATETIME_FORMATS, GLOBAL_FIELD_MAP, GLOBAL_FIELD_ALIASES
 
@@ -89,9 +90,9 @@ def lookup_field_alias(obj, field):
     return field, item
 
 
-def parse_network_value(value) -> List[Union[IPNetwork, IPRange]]:
+def parse_network_value(value) -> List[Union[IPAddress, IPNetwork, IPRange]]:
     """
-    Parse IP range or IP network values
+    Parse IP Address, IP range or IP network values
     """
     try:
         ipranges = []
@@ -109,7 +110,12 @@ def parse_network_value(value) -> List[Union[IPNetwork, IPRange]]:
     values = [arg.strip() for arg in value.split(',')]
     for item in values:
         try:
-            networks.append(IPNetwork(item))
+            network = IPNetwork(item)
+            if network.version == IPV4_VERSION and network.prefixlen == MAX_PREFIX_LEN_IPV4:
+                network = IPAddress(network)
+            if network.version == IPV6_VERSION and network.prefixlen == MAX_PREFIX_LEN_IPV6:
+                network = IPAddress(network)
+            networks.append(network)
         except (AddrFormatError, ValueError) as error:
             raise WhoisQueryError(f'Error parsing network field value {value}: {error}') from error
     return networks

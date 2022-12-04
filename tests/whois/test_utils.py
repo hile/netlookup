@@ -4,8 +4,9 @@ Unit tests for netlookup.whois.utils module
 from datetime import datetime
 
 import pytest
-from netaddr.ip import IPNetwork, IPRange
+from netaddr.ip import IPAddress, IPNetwork, IPRange
 
+from netlookup.constants import IPV4_VERSION, IPV6_VERSION, MAX_PREFIX_LEN_IPV4, MAX_PREFIX_LEN_IPV6
 from netlookup.exceptions import WhoisQueryError
 from netlookup.whois.utils import parse_datetime, parse_field_value, parse_network_value
 
@@ -72,4 +73,4 @@ def test_whois_utils_parse_network_value_valid_network_values(valid_whois_networ
     result = parse_network_value(valid_whois_networks_value)
     assert isinstance(result, list)
     for item in result:
-        assert isinstance(item, IPNetwork)
+        assert isinstance(item, (IPAddress, IPNetwork))
