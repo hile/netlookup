@@ -65,9 +65,11 @@ def parse_field_value(line):
     if not field:
         return None, None
 
-    field = field.strip().rstrip('.').replace(' ', '_').replace('-', '_')
-    field = inflection.underscore(field)
-    return field, value.strip().rstrip(',').replace(',,', ',')
+    field = inflection.underscore(
+        field.strip().rstrip('.').replace(' ', '_').replace('-', '_')
+    )
+    value = value.strip().rstrip(',').replace(',,', ',')
+    return field, value
 
 
 def lookup_field_alias(obj, field):
