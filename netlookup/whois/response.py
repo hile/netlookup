@@ -171,12 +171,13 @@ class PrefixLookupResponse(BaseQueryResponse):
         Query pwhois cache for response
         """
         try:
+            command = ('whois', '-h', PREFIX_WHOIS_SERVER, str(query))
+            self.debug(f'run command {" ".join(command)}')
             stdout, stderr = run_command_lineoutput(
-                *('whois', '-h', PREFIX_WHOIS_SERVER, str(query)),
+                *command,
                 encodings=LINE_ENCODINGS,
                 timeout=QUERY_TIMEOUT
             )
-            print(f'stdout {stdout} stderr {stderr}')
             self.__query__ = query
             self.__load_data__(stdout, stderr, query_type=self.__query_type__)
         except CommandError as error:
@@ -293,9 +294,7 @@ class WhoisLookupResponse(BaseQueryResponse):
         don't want to match
         """
         query_type = self.__detect_query_type__(query)
-        self.debug(f'match query {query} to self {self.__query__} networks {self.networks}')
         if query_type == 'address':
-            self.debug(f'match address {query} to {self.networks}')
             if self.networks:
                 return query in self.networks[0]
         if self.__query__:
