@@ -174,7 +174,7 @@ class PrefixLookup(QueryLookupCache):
         Match a cached prefix lookup value
         """
         for response in self.__responses__:
-            if self.__is_response_valid__(response, max_age):
+            if self.__is_response_valid__(response, max_age) and response.match(value):
                 return response
         return None
 
