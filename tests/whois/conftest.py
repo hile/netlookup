@@ -5,7 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from sys_toolkit.tests.mock import MockRunCommandLineOutput
+from sys_toolkit.exceptions import CommandError
+from sys_toolkit.tests.mock import MockException, MockRunCommandLineOutput
 
 from netlookup.whois.lookup import PrefixLookup, WhoisLookup
 from netlookup.whois.response import WhoisLookupResponse
@@ -33,13 +34,23 @@ MOCK_DOMAIN_KEY_MATCH_COUNT = 15
 MOCK_INETNUM_KEY_MATCH_COUNT = 270
 
 
-def mock_whois_query_response_data(monkeypatch, path: Path) -> str:
+def mock_whois_query_response_data(monkeypatch, path: Path) -> MockRunCommandLineOutput:
     """
     Mock response data for whois lookup query from text file
     """
     mock_response = MockRunCommandLineOutput(path=path)
     monkeypatch.setattr('netlookup.whois.response.run_command_lineoutput', mock_response)
     return mock_response
+
+
+@pytest.fixture
+def mock_whois_command_error(monkeypatch) -> MockException:
+    """
+    Mock errors raised when running whois command line
+    """
+    mock_error = MockException(CommandError)
+    monkeypatch.setattr('netlookup.whois.response.run_command_lineoutput', mock_error)
+    yield mock_error
 
 
 @pytest.fixture

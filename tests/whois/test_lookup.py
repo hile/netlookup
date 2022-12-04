@@ -188,6 +188,17 @@ def test_whois_address_lookup_expired_cache_file(
 
 
 # pylint: disable=unused-argument
+def test_whois_address_lookup_query_error(
+        mock_whois_command_error,
+        empty_whois_query_cache):
+    """
+    Test whois query when command line raises an error
+    """
+    with pytest.raises(WhoisQueryError):
+        empty_whois_query_cache.query(MOCK_WHOIS_QUERY_ADDRESS)
+
+
+# pylint: disable=unused-argument
 def test_whois_prefix_lookup_cache_file(
         mock_whois_query_no_data,
         mock_whois_lookup_cache,
@@ -308,6 +319,17 @@ def test_whois_prefix_lookup_query_empty_cache(
     assert empty_prefix_lookup_query_cache.match(MOCK_PWHOIS_QUERY_MATCH) is None
     response = empty_prefix_lookup_query_cache.query(MOCK_PWHOIS_QUERY_MATCH)
     assert isinstance(response, PrefixLookupResponse)
+
+
+# pylint: disable=unused-argument
+def test_whois_prefix_lookup_query_query_error(
+        mock_whois_command_error,
+        empty_prefix_lookup_query_cache):
+    """
+    Test prefix lookup query when command line raises an error
+    """
+    with pytest.raises(WhoisQueryError):
+        empty_prefix_lookup_query_cache.query(MOCK_PWHOIS_QUERY_MATCH)
 
 
 def test_whois_prefix_lookup_query_cache_write_readonly_error(
