@@ -95,7 +95,7 @@ def test_whois_response_domain_match_address_not_found(
     assert response.match(MOCK_WHOIS_QUERY_ADDRESS) is False
 
 
-def test_prefix_lookup_response_empty_response_properties():
+def test_whois_prefix_lookup_response_empty_response_properties():
     """
     Test properties of an empty PrefixLookupResponse objet
     """
@@ -108,9 +108,12 @@ def test_prefix_lookup_response_empty_response_properties():
     assert obj.as_dict() == {'groups': []}
     assert obj.as_json() == '{}'
 
+    obj.__query__ = MOCK_PWHOIS_QUERY_ADDRESS
+    assert obj.match(MOCK_PWHOIS_QUERY_ADDRESS) is True
+
 
 # pylint: disable=unused-argument
-def test_prefix_lookup_response_valid_response_properties(
+def test_whois_prefix_lookup_response_valid_response_properties(
         mock_whois_query_no_data,
         mock_whois_lookup_cache,
         mock_prefix_lookup_cache):
