@@ -552,6 +552,40 @@ DOMAIN_FIELD_MAP = {
 }
 
 
+# Relevant attributes to collect from prefix whois records
+PREFIX_WHOIS_ATTRIBUTES = {
+    'ip': 'IP Address',
+    'route_prefix': 'Route Prefix',
+    'prefix': 'Network Prefix',
+    'origin_as': 'Origin AS',
+    'as_path': 'AS Path',
+    'next_hop': 'Next Hop',
+    'router_id': 'Router ID',
+    'asn': 'ASN',
+    'as_handle': 'AS Handle',
+    'as_source': 'AS Source',
+    'as_name': 'AS Name',
+    'as_org_id': 'AS Organization ID',
+    'as_org_name': 'AS Organization Name',
+    'geo_cc': 'Country Code',
+    'geo_country': 'Country',
+    'geo_region': 'Region',
+    'geo_city': 'City',
+    'geo_latitude': 'Latitude',
+    'geo_longitude': 'Longitude',
+}
+PREFIX_WHOIS_NETWORK_FIELDS = (
+    'ip',
+    'next_hop',
+    'route_prefix',
+    'prefix',
+    'router_id',
+)
+PREFIX_WHOIS_LIST_FIELDS = (
+    'as_path',
+)
+
+
 class WhoisQueryType(Enum):
     """
     Valid whois query types

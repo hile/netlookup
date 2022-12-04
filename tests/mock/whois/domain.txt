@@ -31,6 +31,16 @@ phone:        +1 703 925-6999
 fax-no:       +1 703 948 3978
 e-mail:       info@verisign-grs.com
 
+contact:      other
+name:         Registry Customer Service Mock Record
+organisation: VeriSign Global Registry Services
+address:      12061 Bluemont Way
+address:      Reston Virginia 20190
+address:      United States
+phone:        +1 703 925-6999
+fax-no:       +1 703 948 3978
+e-mail:       info@verisign-grs.com
+
 nserver:      A.GTLD-SERVERS.NET 192.5.6.30 2001:503:a83e:0:0:0:2:30
 nserver:      B.GTLD-SERVERS.NET 192.33.14.30 2001:503:231d:0:0:0:2:30
 nserver:      C.GTLD-SERVERS.NET 192.26.92.30 2001:503:83eb:0:0:0:0:30
@@ -92,13 +102,13 @@ Registrant Name: GDPR Masked
 Registrant Organization: GDPR Masked
 Registrant Street: GDPR Masked
 Registrant City: GDPR Masked
-Registrant State/Province: 
+Registrant State/Province:
 Registrant Postal Code: GDPR Masked
 Registrant Country: FI
 Registrant Phone: GDPR Masked
-Registrant Phone Ext: 
+Registrant Phone Ext:
 Registrant Fax: GDPR Masked
-Registrant Fax Ext: 
+Registrant Fax Ext:
 Registrant Email: gdpr-masking@gdpr-masked.com
 Registry Admin ID: GDPR Masked
 Admin Name: GDPR Masked
@@ -109,9 +119,9 @@ Admin State/Province: GDPR Masked
 Admin Postal Code: GDPR Masked
 Admin Country: GDPR Masked
 Admin Phone: GDPR Masked
-Admin Phone Ext: 
+Admin Phone Ext:
 Admin Fax: GDPR Masked
-Admin Fax Ext: 
+Admin Fax Ext:
 Admin Email: gdpr-masking@gdpr-masked.com
 Registry Tech ID: GDPR Masked
 Tech Name: GDPR Masked
@@ -122,9 +132,9 @@ Tech State/Province: GDPR Masked
 Tech Postal Code: GDPR Masked
 Tech Country: GDPR Masked
 Tech Phone: GDPR Masked
-Tech Phone Ext: 
+Tech Phone Ext:
 Tech Fax: GDPR Masked
-Tech Fax Ext: 
+Tech Fax Ext:
 Tech Email: gdpr-masking@gdpr-masked.com
 Name Server: ns1.r4l.com
 Name Server: ns2.r4l.com
@@ -133,4 +143,3 @@ Registrar Abuse Contact Email: abuse@register4less.com
 Registrar Abuse Contact Phone: +1.5149056500
 URL of the ICANN WHOIS Data Problem Reporting System: http://wdprs.internic.net/
 >>> Last update of WHOIS database: 2020-05-20T03:16:51Z <<<
-

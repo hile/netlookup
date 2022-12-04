@@ -246,7 +246,7 @@ class Prefix(InformationSectionGroup):
     Prefix in prefix whois data
     """
     __groups__ = (
-        'route_prefix',
+        'prefix',
     )
 
 

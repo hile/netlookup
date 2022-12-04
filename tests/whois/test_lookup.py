@@ -18,6 +18,7 @@ from .constants import (
     MOCK_PWHOIS_QUERY_MATCH,
     MOCK_WHOIS_QUERY_ADDRESS,
     MOCK_WHOIS_QUERY_DOMAIN,
+    MOCK_WHOIS_QUERY_MATCH_NETWORKS,
 )
 from .conftest import MOCK_DOMAIN_KEY_MATCH_COUNT, MOCK_INETNUM_KEY_MATCH_COUNT
 
@@ -114,7 +115,7 @@ def test_whois_address_lookup_empty_cache_properties(empty_whois_query_cache) ->
 
 
 # pylint: disable=unused-argument
-def test_whois_address_lookup_cache_file(
+def test_whois_domain_lookup_cache_file(
         mock_whois_query_no_data,
         mock_whois_lookup_cache):
     """
@@ -124,10 +125,9 @@ def test_whois_address_lookup_cache_file(
     assert whois.__default_cache_file__ == WHOIS_CACHE_FILE
     assert whois.cache_file.exists()
     assert isinstance(whois, WhoisLookup)
-    for item in whois.__dns_lookup_table__.values():
-        print(item)
-    res = whois.query(MOCK_WHOIS_QUERY_DOMAIN)
-    assert isinstance(res, WhoisLookupResponse)
+    response = whois.query(MOCK_WHOIS_QUERY_DOMAIN)
+    assert isinstance(response, WhoisLookupResponse)
+    assert isinstance(response.description, str)
 
 
 def test_whois_domain_lookup_expired_cache_file(
@@ -160,6 +160,8 @@ def test_whois_domain_lookup_unloaded_cache_file(
     assert isinstance(response, WhoisLookupResponse)
     assert mock_whois_domain_query.call_count == 1
 
+    assert isinstance(response.description, str)
+
 
 def test_whois_address_lookup_unloaded_cache_file(
         mock_whois_address_query,
@@ -172,6 +174,8 @@ def test_whois_address_lookup_unloaded_cache_file(
     response = whois.query(MOCK_WHOIS_QUERY_ADDRESS)
     assert isinstance(response, WhoisLookupResponse)
     assert mock_whois_address_query.call_count == 1
+    assert response.networks == MOCK_WHOIS_QUERY_MATCH_NETWORKS
+    assert isinstance(response.description, str)
 
 
 def test_whois_address_lookup_expired_cache_file(
@@ -284,7 +288,7 @@ def test_whois_address_lookup_address_success(mock_whois_default_cache, mock_who
     assert mock_whois_address_query.call_count == 1
     assert response.__query__ == MOCK_WHOIS_QUERY_ADDRESS
     assert response.__query_type__ == WhoisQueryType.ADDRESS
-    print(response)
+
     assert whois.query(MOCK_WHOIS_QUERY_ADDRESS) == response
     assert mock_whois_address_query.call_count == 1
 
@@ -317,6 +321,7 @@ def test_whois_prefix_lookup_query_empty_cache(
     """
     assert len(empty_prefix_lookup_query_cache.__responses__) == 0
     assert empty_prefix_lookup_query_cache.match(MOCK_PWHOIS_QUERY_MATCH) is None
+
     response = empty_prefix_lookup_query_cache.query(MOCK_PWHOIS_QUERY_MATCH)
     assert isinstance(response, PrefixLookupResponse)
 
@@ -335,7 +340,7 @@ def test_whois_prefix_lookup_query_query_error(
 def test_whois_prefix_lookup_query_cache_write_readonly_error(
         capsys,
         mock_prefix_lookup_default_cache_readonly,
-        mock_whois_domain_query) -> None:
+        mock_prefix_lookup_query) -> None:
     """
     Test writing whois lookup cache file when cache file is readonly and write failss
     """

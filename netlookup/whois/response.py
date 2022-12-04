@@ -6,8 +6,9 @@ import json
 
 from datetime import datetime
 from operator import attrgetter
+from typing import List, Optional
 
-from netaddr.ip import IPAddress, AddrFormatError
+from netaddr.ip import IPAddress, IPNetwork, AddrFormatError
 
 from sys_toolkit.base import LoggingBaseClass
 from sys_toolkit.exceptions import CommandError
@@ -16,9 +17,16 @@ from sys_toolkit.subprocess import run_command_lineoutput
 from ..encoders import NetworkDataEncoder
 from ..exceptions import WhoisQueryError
 
-from .constants import PREFIX_WHOIS_SERVER, ORGANIZATION_FIELDS, WhoisQueryType
+from .constants import (
+    PREFIX_WHOIS_SERVER,
+    PREFIX_WHOIS_ATTRIBUTES,
+    PREFIX_WHOIS_LIST_FIELDS,
+    PREFIX_WHOIS_NETWORK_FIELDS,
+    ORGANIZATION_FIELDS,
+    WhoisQueryType
+)
 from .groups import InformationSectionGroup, GROUP_LOADERS
-from .utils import parse_field_value
+from .utils import parse_field_value, parse_network_value
 
 COMMENT_MARKERS = ('#%')
 LINE_ENCODINGS = ('utf-8', 'latin1')
@@ -73,8 +81,6 @@ class BaseQueryResponse(LoggingBaseClass):
     def __stdout_item_iterator__(self):
         """
         Parse whois query data as iterator
-
-        Triggers query if self.__stdout__ or self.__stderr__ is undefined
         """
         group = None
         is_label = False
@@ -142,12 +148,46 @@ class PrefixLookupResponse(BaseQueryResponse):
     """
     Query response from whois.pwhois.org server (prefix whois data)
     """
+    ip: Optional[IPAddress] = None
+    route_prefix: Optional[IPNetwork] = None
+    prefix: Optional[IPNetwork] = None
+    next_hop: Optional[IPAddress] = None
+    router_id: Optional[IPAddress] = None
+    asn: str = ''
+    as_path: List[str] = []
+    origin_as: str = ''
+    as_handle: str = ''
+    as_source: str = ''
+    as_name: str = ''
+    as_org_id: str = ''
+    as_org_name: str = ''
+    geo_cc: str = ''
+    geo_country: str = ''
+    geo_region: str = ''
+    geo_city: str = ''
+    geo_latitude: str = ''
+    geo_longitude: str = ''
+
     def __init__(self, whois, debug_enabled=False, silent=False):
         super().__init__(whois, debug_enabled=debug_enabled, silent=silent)
         self.__query_type__ = WhoisQueryType.PREFIX
 
     def __repr__(self) -> str:
         return str(self.smallest_network) if self.smallest_network else ''
+
+    def __stdout_item_iterator__(self):
+        """
+        Parse prefix lookup query data as iterator
+        """
+        for line in self.__stdout__:
+            field, value = parse_field_value(line)
+            if field in PREFIX_WHOIS_LIST_FIELDS:
+                value = value.split()
+            if field in PREFIX_WHOIS_NETWORK_FIELDS:
+                value = parse_network_value(value)[0]
+            if field in PREFIX_WHOIS_ATTRIBUTES:
+                setattr(self, field, value)
+            yield (field, value)
 
     def match(self, query) -> bool:
         """
@@ -183,24 +223,16 @@ class PrefixLookupResponse(BaseQueryResponse):
         """
         Return data as dictionary
         """
-        return {
-            'groups': self.groups,
-        }
+        data = {}
+        for attr in PREFIX_WHOIS_ATTRIBUTES:
+            data[attr] = getattr(self, attr)
+        return data
 
     def as_json(self):
         """
         Return whois query result as JSON
         """
-        response = {}
-        for group in self.groups:
-            for key, value in group.as_dict().items():
-                if key not in response:
-                    response[key] = value
-                elif not isinstance(response[key], list):
-                    response[key] = [response[key]] + [value]
-                else:
-                    response[key].append(value)
-        return json.dumps(response, indent=2, cls=NetworkDataEncoder)
+        return json.dumps(self.as_dict(), indent=2, cls=NetworkDataEncoder)
 
 
 class WhoisLookupResponse(BaseQueryResponse):

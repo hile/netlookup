@@ -192,7 +192,7 @@ class PrefixLookup(QueryLookupCache):
             silent=self.__setattr__
         )
         response.query(value)
-        if not response.groups:
+        if not response.ip:
             raise WhoisQueryError('Prefix whois query returns no data')
         self.__responses__.append(response)
         try:
