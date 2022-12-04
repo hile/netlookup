@@ -53,50 +53,11 @@ class BaseQueryResponse(LoggingBaseClass):
         self.__stderr__ = None
         self.__loaded__ = None
 
-    def __get_group_loader_class__(self, line):
-        """
-        Get loader class for specified section group type
-        """
-        field, value = parse_field_value(line)
-        is_label = not value
-        if field is None:
-            return None, is_label
-        for loader in self.__group_loaders__:
-            if field in loader.__groups__:
-                return loader, is_label
-        self.debug(f'unmapped group {field}')
-        return self.__fallback_group_loader__, is_label
-
-    def __create_group__(self, line):
-        """
-        Create group from output line
-        """
-        loader, is_label = self.__get_group_loader_class__(line)
-        if loader is None:
-            return None, is_label
-        group = loader(self, line)
-        self.groups.append(group)
-        return group, is_label
-
     def __stdout_item_iterator__(self):
         """
-        Parse whois query data as iterator
+        Iterator over lines in self.__stdout__
         """
-        group = None
-        is_label = False
-        for line in self.__stdout__:
-            comment = line[:1] in COMMENT_MARKERS
-            if comment or line.strip() == '':
-                has_data = group is not None and not group.is_empty
-                if not is_label or is_label and has_data:
-                    group = None
-            elif group is None:
-                group, is_label = self.__create_group__(line)
-                if group is not None:
-                    yield group
-
-            if group is not None:
-                group.parse_line(line)
+        raise NotImplementedError
 
     def __detect_networks__(self):
         """
@@ -134,15 +95,6 @@ class BaseQueryResponse(LoggingBaseClass):
             self.__loaded__ = datetime.now().timestamp()
         self.__detect_networks__()
 
-    @property
-    def smallest_network(self):
-        """
-        Return smallest network for a response
-        """
-        if self.networks:
-            return self.networks[0]
-        return None
-
 
 class PrefixLookupResponse(BaseQueryResponse):
     """
@@ -173,7 +125,7 @@ class PrefixLookupResponse(BaseQueryResponse):
         self.__query_type__ = WhoisQueryType.PREFIX
 
     def __repr__(self) -> str:
-        return str(self.smallest_network) if self.smallest_network else ''
+        return str(self.prefix) if self.prefix else ''
 
     def __stdout_item_iterator__(self):
         """
@@ -252,6 +204,51 @@ class WhoisLookupResponse(BaseQueryResponse):
             return self.__query__
         return str(self.__class__)
 
+    def __get_group_loader_class__(self, line):
+        """
+        Get loader class for specified section group type
+        """
+        field, value = parse_field_value(line)
+        is_label = not value
+        if field is None:
+            return None, is_label
+        for loader in self.__group_loaders__:
+            if field in loader.__groups__:
+                return loader, is_label
+        self.debug(f'unmapped group {field}')
+        return self.__fallback_group_loader__, is_label
+
+    def __create_group__(self, line):
+        """
+        Create group from output line
+        """
+        loader, is_label = self.__get_group_loader_class__(line)
+        if loader is None:
+            return None, is_label
+        group = loader(self, line)
+        self.groups.append(group)
+        return group, is_label
+
+    def __stdout_item_iterator__(self):
+        """
+        Parse whois query data as iterator
+        """
+        group = None
+        is_label = False
+        for line in self.__stdout__:
+            comment = line[:1] in COMMENT_MARKERS
+            if comment or line.strip() == '':
+                has_data = group is not None and not group.is_empty
+                if not is_label or is_label and has_data:
+                    group = None
+            elif group is None:
+                group, is_label = self.__create_group__(line)
+                if group is not None:
+                    yield group
+
+            if group is not None:
+                group.parse_line(line)
+
     # pylint: disable=too-many-nested-blocks
     @property
     def description(self):
@@ -293,6 +290,15 @@ class WhoisLookupResponse(BaseQueryResponse):
             if field == '' or len(field.split()) > 1:
                 raise WhoisQueryError(f'invalid whois query {query}')
         return WhoisQueryType.DOMAIN.value
+
+    @property
+    def smallest_network(self):
+        """
+        Return smallest network for a response
+        """
+        if self.networks:
+            return self.networks[0]
+        return None
 
     def query(self, query):
         """

@@ -212,8 +212,6 @@ def test_whois_prefix_lookup_cache_file(
     """
     prefixes = mock_prefix_lookup_cache
     assert prefixes.__default_cache_file__ == PREFIX_CACHE_FILE
-    for prefix in prefixes.__responses__:
-        print(prefix)
     assert len(prefixes.__responses__) == MOCK_PWHOIS_RESPONSE_COUNT
     assert prefixes.cache_file.exists()
     assert isinstance(prefixes, PrefixLookup)
