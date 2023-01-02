@@ -1,5 +1,5 @@
 """
-Unit tests for netlookup.whois.network_sets.cloudflare module
+Unit tests for netlookup.network_sets.cloudflare module
 """
 import pytest
 

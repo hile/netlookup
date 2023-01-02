@@ -1,5 +1,5 @@
 """
-Unit tests for netlookup.whois.network_sets.aws module
+Unit tests for netlookup.network_sets.aws module
 """
 import pytest
 

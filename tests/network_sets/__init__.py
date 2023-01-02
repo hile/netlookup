@@ -1,3 +1,3 @@
 """
-Unit tests for netlookup.whois.network_sets module
+Unit tests for netlookup.network_sets module
 """

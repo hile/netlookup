@@ -1,5 +1,5 @@
 """
-Unit tests for netlookup.whois.network_sets.google module
+Unit tests for netlookup.network_sets.google module
 """
 import pytest
 

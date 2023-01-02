@@ -7,8 +7,6 @@ from netaddr.ip import IPAddress, IPNetwork, IPRange
 
 from sys_toolkit.encoders import DateTimeEncoder
 
-from .whois.constants import WhoisQueryType
-
 
 class NetworkDataEncoder(DateTimeEncoder):
     """
@@ -23,8 +21,6 @@ class NetworkDataEncoder(DateTimeEncoder):
         """
         Encode network objects as strings
         """
-        if isinstance(o, WhoisQueryType):
-            return str(o.value)
         if isinstance(o, (IPAddress, IPNetwork, IPRange)):
             return str(o)
         return super().default(o)

@@ -1,23 +1,21 @@
 """
 Unit test configuration for netlookup module
 """
-from datetime import datetime
 from http import HTTPStatus
 from pathlib import Path
 from shutil import copyfile, copytree, rmtree
-from typing import Optional, Union
+from typing import Optional
 
 import pytest
 
 from dns.resolver import NXDOMAIN
-from sys_toolkit.tests.mock import MockCalledMethod, MockException, MockRunCommandLineOutput
+from sys_toolkit.tests.mock import MockCalledMethod, MockException
 
 from netlookup.network import Network
 from netlookup.exceptions import NetworkError
 from netlookup.network_sets.aws import AWS_IP_RANGES_URL
 from netlookup.network_sets.cloudflare import CLOUDFLARE_IP_RANGES_IPV4_URL, CLOUDFLARE_IP_RANGES_IPV6_URL
 from netlookup.prefixes import Prefixes
-from netlookup.whois import PrefixLookup, WhoisLookup
 
 from .constants import (
     GOOGLE_NETWORK_SET_SPF_RECORDS,
@@ -39,39 +37,14 @@ MOCK_DATA = Path(__file__).parent.joinpath('mock')
 MOCK_PREFIXES_CACHE_DIRECTORY = MOCK_DATA.joinpath('prefixes/cache')
 MOCK_PREFIXES_CACHE_INVALID_DIRECTORY = MOCK_DATA.joinpath('prefixes/cache_invalid')
 
-MOCK_PREFIX_LOOKUP_CACHE_FILE = MOCK_DATA.joinpath('whois/pwhois_cache.json')
-MOCK_WHOIS_LOOKUP_CACHE_FILE = MOCK_DATA.joinpath('whois/cache.json')
-
 MOCK_AWS_IP_RANGES_FILE = MOCK_DATA.joinpath('network_sets/aws_ip_ranges.json')
 MOCK_CLOUDFLARE_V4_RANGES_FILE = MOCK_DATA.joinpath('network_sets/cloudflare_ipv4.txt')
 MOCK_CLOUDFLARE_V6_RANGES_FILE = MOCK_DATA.joinpath('network_sets/cloudflare_ipv6.txt')
 
-MOCK_WHOIS_CACHE_RESPONSE_COUNT = 164
 MOCK_AWS_IP_RANGES_COUNT = 7042
 MOCK_CLOUDFLARE_IP_RANGES_COUNT = 22
 MOCK_GOOGLE_CLOUD_IP_RANGES_COUNT = 74
 MOCK_GOOGLE_SERVICE_IP_RANGES_COUNT = 27
-
-
-def invalidate_responses(
-        cache: Union[WhoisLookup, PrefixLookup],
-        value: Optional[Union[int, float]] = None) -> Union[WhoisLookup, PrefixLookup]:
-    """
-    Invalidate cached lookup entries by setting __loaded__ to specified value
-    """
-    for response in cache.__responses__:
-        response.__loaded__ = value
-    return cache
-
-
-def refresh_responses(cache: Union[WhoisLookup, PrefixLookup]) -> Union[WhoisLookup, PrefixLookup]:
-    """
-    Refresh cached lookup entries with current timestamp
-    """
-    now = datetime.now().timestamp()
-    for response in cache.__responses__:
-        response.__loaded__ = now
-    return cache
 
 
 # pylint: disable=too-few-public-methods
@@ -322,76 +295,6 @@ def mock_prefixes_cache_invalid_json_data(tmpdir) -> Prefixes:
     yield cache_directory
     if cache_directory.exists():
         rmtree(cache_directory)
-
-
-@pytest.fixture
-def mock_whois_query_no_data(monkeypatch) -> str:
-    """
-    Mock query for whois query to return no data
-    """
-    mock_response = MockRunCommandLineOutput(stdout='', stderr='')
-    monkeypatch.setattr('netlookup.whois.response.run_command_lineoutput', mock_response)
-    return mock_response
-
-
-@pytest.fixture
-def mock_whois_lookup_cache(tmpdir) -> WhoisLookup:
-    """
-    Return whois address lookup object with cache file from mocked data
-
-    Cached responses are all refrested to current timestamp by default
-    """
-    cache_file = Path(tmpdir.strpath).joinpath('whois_cache.json')
-    copyfile(MOCK_WHOIS_LOOKUP_CACHE_FILE, cache_file)
-    yield refresh_responses(WhoisLookup(cache_file=cache_file))
-
-
-@pytest.fixture
-def mock_whois_lookup_cache_unloaded(mock_whois_lookup_cache) -> WhoisLookup:
-    """
-    Return the default whois lookup cache with uninitialized responses
-    """
-    yield invalidate_responses(mock_whois_lookup_cache, value=None)
-
-
-@pytest.fixture
-def mock_whois_lookup_cache_expired(mock_whois_lookup_cache) -> WhoisLookup:
-    """
-    Return the default whois lookup cache with expired responses
-    """
-    yield invalidate_responses(mock_whois_lookup_cache, value=1)
-
-
-@pytest.fixture
-def mock_prefix_lookup_cache(tmpdir) -> PrefixLookup:
-    """
-    Return prefix address lookup object with cache file from mocked data
-
-    Cached responses are all refrested to current timestamp by default
-    """
-    cache_file = Path(tmpdir.strpath).joinpath('pwhois_cache.json')
-    copyfile(MOCK_PREFIX_LOOKUP_CACHE_FILE, cache_file)
-    yield refresh_responses(PrefixLookup(cache_file=cache_file))
-
-
-@pytest.fixture
-def mock_prefix_lookup_cache_unloaded(mock_prefix_lookup_cache) -> PrefixLookup:
-    """
-    Return prefix address lookup object with cache file from mocked data
-
-    Cached responses are all refrested to current timestamp by default
-    """
-    yield invalidate_responses(mock_prefix_lookup_cache, value=None)
-
-
-@pytest.fixture
-def mock_prefix_lookup_cache_expired(mock_prefix_lookup_cache) -> PrefixLookup:
-    """
-    Return prefix address lookup object with cache file from mocked data
-
-    Cached responses are all refrested to current timestamp by default
-    """
-    yield invalidate_responses(mock_prefix_lookup_cache, value=1)
 
 
 @pytest.fixture
