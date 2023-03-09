@@ -1,4 +1,11 @@
-
+#
+# Copyright (C) 2020-2023 by Ilkka Tuohela <hile@iki.fi>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+"""
+Extensions to netaddr objects as networks
+"""
 from bisect import bisect_left
 from typing import Optional
 

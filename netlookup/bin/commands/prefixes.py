@@ -1,7 +1,14 @@
+#
+# Copyright (C) 2020-2023 by Ilkka Tuohela <hile@iki.fi>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
 """
 CLI command 'netlookup prefixes'
 """
+from argparse import ArgumentParser, Namespace
 from typing import List, Optional
+
 from ...prefixes import Prefixes
 from .base import BaseCommand
 
@@ -10,13 +17,17 @@ class PrefixLookup(BaseCommand):
     """
     Command for function for 'netlookup prefixes' CLI command
     """
-    name = 'prefixes'
-    short_description = 'Lookup prefixes'
+    name: str = 'prefixes'
+    short_description: str = 'Lookup prefixes'
     __prefixes__: Optional[Prefixes] = None
 
-    def register_parser_arguments(self, parser):
+    def register_parser_arguments(self, parser: ArgumentParser) -> ArgumentParser:
+        """
+        Register address list arguments and update flags
+        """
         parser.add_argument('-u', '--update', action='store_true', help='Update prefix cache')
         parser.add_argument('addresses', nargs='*', help='Prefixes to lookup')
+        return parser
 
     @property
     def prefixes(self) -> Prefixes:
@@ -49,7 +60,7 @@ class PrefixLookup(BaseCommand):
             except Exception as error:
                 self.error(f'Error looking up address "{address}": {error}')
 
-    def run(self, args):
+    def run(self, args: Namespace) -> None:
         """
         Run 'netlookup prefixes' command
         """

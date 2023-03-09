@@ -1,4 +1,14 @@
+#
+# Copyright (C) 2020-2023 by Ilkka Tuohela <hile@iki.fi>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+"""
+CLI command 'netlookup info'
+"""
+from argparse import ArgumentParser, Namespace
 
+from ...network import Network
 from .base import BaseCommand
 
 
@@ -6,11 +16,10 @@ class Info(BaseCommand):
     """
     Command for function for 'netlookup info' CLI command
     """
-
     name = 'info'
     help = 'Show subnet info'
 
-    def print_network_details(self, network):
+    def print_network_details(self, network: Network):
         """
         Show details for specified network
         """
@@ -31,10 +40,10 @@ class Info(BaseCommand):
         self.message(f'         Bits {network.network.bits()}')
         self.message(f'  Reverse DNS {network.network.reverse_dns}')
 
-    def register_parser_arguments(self, parser):
+    def register_parser_arguments(self, parser: ArgumentParser):
         parser.add_argument('subnets', nargs='*', help='Subnets to process')
 
-    def run(self, args):  # pylint: disable=W0613
+    def run(self, args: Namespace) -> None:
         if not args.subnets:
             self.exit(1, 'No subnets specified')
 

@@ -3,11 +3,12 @@ name = "netlookup"
 version = "2.0.1"
 description = "Python tools to look up information about networks"
 authors = ["Ilkka Tuohela <hile@iki.fi>"]
+homepage = "https://github.com/hile/netlookup"
 readme = "README.md"
 include = [
     "LICENSE",
 ]
-license = "BSD"
+license = "BSD-3-Clause"
 classifiers = [
     "Environment :: Console",
     "License :: OSI Approved :: BSD License",

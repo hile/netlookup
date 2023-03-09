@@ -1,3 +1,12 @@
+#
+# Copyright (C) 2020-2023 by Ilkka Tuohela <hile@iki.fi>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+"""
+CLI tool to split network prefixes
+"""
+from argparse import ArgumentParser, Namespace
 
 from .base import BaseCommand
 
@@ -6,11 +15,13 @@ class Split(BaseCommand):
     """
     Command for function for 'netlookup split' CLI command
     """
+    name: str = 'split'
+    short_description: str = 'Show split subnet to prefixes'
 
-    name = 'split'
-    short_description = 'Show split subnet to prefixes'
-
-    def register_parser_arguments(self, parser):
+    def register_parser_arguments(self, parser: ArgumentParser) -> ArgumentParser:
+        """
+        Add CLI arguments for netmask and subnet list
+        """
         parser.add_argument(
             '-m', '--mask',
             type=int,
@@ -21,8 +32,12 @@ class Split(BaseCommand):
             nargs='*',
             help='Subnets to process'
         )
+        return parser
 
-    def run(self, args):
+    def run(self, args: Namespace) -> None:
+        """
+        Run command, splitting networks and printing results on stdout
+        """
         if not args.subnets:
             self.exit(1, 'No subnets specified')
 

@@ -1,4 +1,12 @@
-
+#
+# Copyright (C) 2020-2023 by Ilkka Tuohela <hile@iki.fi>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+"""
+CLI utility to split a network from another
+"""
+from argparse import ArgumentParser, Namespace
 from netlookup.network import NetworkError
 from netlookup.network_sets.base import NetworkSet
 
@@ -9,11 +17,10 @@ class Subtract(BaseCommand):
     """
     Command for function for 'netlookup substract' CLI command
     """
+    name: str = 'subtract'
+    short_description: str = 'Substract subnet from specified subnets'
 
-    name = 'subtract'
-    short_description = 'Substract subnet from specified subnets'
-
-    def register_parser_arguments(self, parser):
+    def register_parser_arguments(self, parser: ArgumentParser) -> ArgumentParser:
         """
         Register arguments for subtracted networks
         """
@@ -28,8 +35,9 @@ class Subtract(BaseCommand):
             nargs='*',
             help='Subnets to subtract from'
         )
+        return parser
 
-    def parse_args(self, args=None, namespace=None):
+    def parse_args(self, args: Namespace = None, namespace: Namespace = None) -> Namespace:
         """
         Parse subnet arguments
         """
@@ -40,9 +48,9 @@ class Subtract(BaseCommand):
         ]
         return args
 
-    def run(self, args):
+    def run(self, args: Namespace) -> None:
         """
-        Substract subnets
+        Substract subnets and print the split ranges
         """
         if not args.subnets:
             self.exit(1, 'No subnets specified')
