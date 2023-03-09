@@ -50,6 +50,11 @@ class Service(FileItem):
     """
     Single service in the services file
     """
+    port_number: str
+    protocol: str
+    name: str
+    aliases: str
+    comment: str
     __patterns__: List[re.Pattern] = SERVICE_LINE_PATTERNS
 
     def __init__(self,

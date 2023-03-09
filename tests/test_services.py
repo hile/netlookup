@@ -38,7 +38,7 @@ def validate_services(services: Services, count: int) -> None:
 
 
 # pylint: disable=unused-argument
-def test_services_load_darwin(mock_darwin_files):
+def test_services_load_darwin(mock_darwin_files) -> None:
     """
     Mock loading services for macOS Darwin
     """
@@ -46,7 +46,7 @@ def test_services_load_darwin(mock_darwin_files):
 
 
 # pylint: disable=unused-argument
-def test_services_load_freebsd(mock_freebsd_files):
+def test_services_load_freebsd(mock_freebsd_files) -> None:
     """
     Mock loading services for FreeBSD
     """
@@ -54,7 +54,7 @@ def test_services_load_freebsd(mock_freebsd_files):
 
 
 # pylint: disable=unused-argument
-def test_services_load_linux(mock_linux_files):
+def test_services_load_linux(mock_linux_files) -> None:
     """
     Mock loading services for Linux
     """
@@ -62,7 +62,7 @@ def test_services_load_linux(mock_linux_files):
 
 
 # pylint: disable=unused-argument
-def test_services_load_openbsd(mock_openbsd_files):
+def test_services_load_openbsd(mock_openbsd_files) -> None:
     """
     Mock loading services for OpenBSD
     """

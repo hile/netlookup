@@ -11,12 +11,16 @@ import json
 from datetime import datetime
 from http import HTTPStatus
 from operator import attrgetter
+from typing import List, Optional, Tuple, TYPE_CHECKING
 
 import requests
 
 from ..exceptions import NetworkError
 from .base import NetworkSet, NetworkSetItem
 from .constants import REQUEST_TIMEOUT
+
+if TYPE_CHECKING:
+    from ..network import Network
 
 AWS_IP_RANGES_URL = 'https://ip-ranges.amazonaws.com/ip-ranges.json'
 SKIP_SERVICE_NAMES = (
@@ -28,15 +32,17 @@ class AWSPrefix(NetworkSetItem):
     """
     AWS network prefix with region and service details
     """
-    type = 'aws'
-    extra_attributes = ('region', 'services')
+    type: str = 'aws'
+    network: 'Network'
+    region: Optional[str]
+    extra_attributes: Tuple[str] = ('region', 'services')
 
-    def __init__(self, network, data=None):
+    def __init__(self, network: 'Network', data: dict = None):
         self.region = None
         self.services = []
         super().__init__(network, data)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'{self.type} {self.region} {self.cidr}'
 
 
@@ -44,12 +50,12 @@ class AWS(NetworkSet):
     """
     AWS address networks
     """
-    type = 'aws'
-    cache_filename = 'aws-networks.json'
+    type: str = 'aws'
+    cache_filename: str = 'aws-networks.json'
     loader_class = AWSPrefix
 
     @property
-    def regions(self):
+    def regions(self) -> List[str]:
         """
         Return all detected regions
         """

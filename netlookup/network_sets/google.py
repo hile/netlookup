@@ -71,7 +71,7 @@ class GoogleNetworkSet(NetworkSet):
     Google network set with data for TXT DNS records
     """
     @property
-    def __address_list_record__(self):
+    def __address_list_record__(self) -> None:
         raise NotImplementedError
 
     def fetch(self) -> None:
@@ -97,12 +97,12 @@ class GoogleCloud(GoogleNetworkSet):
     """
     Google Cloud address ranges
     """
-    type = 'google-cloud'
-    cache_filename = 'google-cloud-networks.json'
+    type: str = 'google-cloud'
+    cache_filename: str = 'google-cloud-networks.json'
     loader_class = GoogleCloudPrefix
 
     @property
-    def __address_list_record__(self):
+    def __address_list_record__(self) -> str:
         return GOOGLE_CLOUD_ADDRESS_LIST_RECORD
 
 
@@ -117,10 +117,10 @@ class GoogleServices(GoogleNetworkSet):
     """
     Google services address ranges
     """
-    type = 'google'
-    cache_filename = 'google-service-networks.json'
+    type: str = 'google'
+    cache_filename: str = 'google-service-networks.json'
     loader_class = GoogleServicePrefix
 
     @property
-    def __address_list_record__(self):
+    def __address_list_record__(self) -> str:
         return GOOGLE_SERVICES_ADDRESS_LIST_RECORD

@@ -7,7 +7,7 @@
 Extensions to netaddr objects as networks
 """
 from bisect import bisect_left
-from typing import Optional
+from typing import Any, List, Optional, Union
 
 from netaddr.ip import IPNetwork, IPAddress
 from netaddr.core import AddrFormatError
@@ -16,7 +16,7 @@ from .constants import IPV4_VERSION, IPV6_VERSION, MAX_PREFIX_LEN_IPV4, MAX_PREF
 from .exceptions import NetworkError
 
 
-def find_address_in_networks(networks, value):
+def find_address_in_networks(networks: List['Network'], value: Any) -> Optional['Network']:
     """
     Find given address in networks
     """
@@ -41,7 +41,7 @@ def find_address_in_networks(networks, value):
     return None
 
 
-def parse_address_or_network(value):
+def parse_address_or_network(value: Any) -> Union[IPAddress, 'Network']:
     """
     Parse value as IPAddress or Network
     """
@@ -61,7 +61,7 @@ class NetworkList(list):
     """
     Base class for a list of networks
     """
-    def clear(self):
+    def clear(self) -> None:
         del self[:len(self)]
 
 
@@ -69,7 +69,7 @@ class Network(IPNetwork):
     """
     Extend IPNetwork with some custom attributes
     """
-    def __eq__(self, other):
+    def __eq__(self, other: Union[str, IPAddress, 'Network']) -> bool:
         if isinstance(other, str):
             other = parse_address_or_network(other)
         if isinstance(other, Network):
@@ -78,35 +78,35 @@ class Network(IPNetwork):
             return self.value == other.value
         return self.value == other
 
-    def __ne__(self, other):
+    def __ne__(self, other: Union[str, IPAddress, 'Network']) -> bool:
         return not self.__eq__(other)
 
-    def __lt__(self, other):
+    def __lt__(self, other: Union[str, IPAddress, 'Network']) -> bool:
         if isinstance(other, str):
             return str(self.cidr) < other
         if isinstance(other, (Network, IPAddress)):
             return self.value < other.value
         return self.value < other
 
-    def __le__(self, other):
+    def __le__(self, other: Union[str, IPAddress, 'Network']) -> bool:
         if isinstance(other, str):
             return str(self.cidr) <= other
         if isinstance(other, (Network, IPAddress)):
             return self.value <= other.value
         return self.value <= other
 
-    def __gt__(self, other):
+    def __gt__(self, other: Union[str, IPAddress, 'Network']) -> bool:
         if isinstance(other, (Network, IPAddress)):
             return self.last > other.value
         return self.value > other
 
-    def __ge__(self, other):
+    def __ge__(self, other: Union[str, IPAddress, 'Network']) -> bool:
         if isinstance(other, (Network, IPAddress)):
             return self.value >= other.value
         return self.value >= other
 
     @property
-    def total_hosts(self):
+    def total_hosts(self) -> int:
         """
         Return total number of available hosts in subnet, excluding network and
         broadcast addresses
@@ -124,7 +124,7 @@ class Network(IPNetwork):
         return self.size - 2
 
     @property
-    def first_host(self):
+    def first_host(self) -> Optional[IPAddress]:
         """
         Return first available host in network, excluding network address
         """
@@ -141,7 +141,7 @@ class Network(IPNetwork):
         return IPAddress(self.first + 1)
 
     @property
-    def last_host(self):
+    def last_host(self) -> Optional[IPAddress]:
         """
         Return last available host in network, excluding broadcast address
         """

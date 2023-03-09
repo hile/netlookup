@@ -37,7 +37,7 @@ def validate_protocols(protocols: Protocols, count: int) -> None:
 
 
 # pylint: disable=unused-argument
-def test_protocols_load_darwin(mock_darwin_files):
+def test_protocols_load_darwin(mock_darwin_files) -> None:
     """
     Mock loading protocols for macOS Darwin
     """
@@ -45,7 +45,7 @@ def test_protocols_load_darwin(mock_darwin_files):
 
 
 # pylint: disable=unused-argument
-def test_protocols_load_freebsd(mock_freebsd_files):
+def test_protocols_load_freebsd(mock_freebsd_files) -> None:
     """
     Mock loading protocols for FreeBSD
     """
@@ -53,7 +53,7 @@ def test_protocols_load_freebsd(mock_freebsd_files):
 
 
 # pylint: disable=unused-argument
-def test_protocols_load_linux(mock_linux_files):
+def test_protocols_load_linux(mock_linux_files) -> None:
     """
     Mock loading protocols for Linux
     """
@@ -61,7 +61,7 @@ def test_protocols_load_linux(mock_linux_files):
 
 
 # pylint: disable=unused-argument
-def test_protocols_load_openbsd(mock_openbsd_files):
+def test_protocols_load_openbsd(mock_openbsd_files) -> None:
     """
     Mock loading protocols for OpenBSD
     """

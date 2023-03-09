@@ -10,7 +10,7 @@ import json
 
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Any, Dict, Iterator, List, Optional, Tuple
 
 from netaddr.core import AddrFormatError
 from netaddr.ip.sets import IPSet
@@ -22,10 +22,11 @@ class NetworkSetItem(Network):
     """
     Named network prefix for specific vendor and service
     """
-    type = 'generic'
-    extra_attributes = []
+    type: str = 'generic'
+    network: Network
+    extra_attributes: Tuple[str] = ()
 
-    def __init__(self, network, data=None):
+    def __init__(self, network: Network, data=None):
         super().__init__(network)
         if data is not None:
             for attr in self.extra_attributes:
@@ -38,7 +39,7 @@ class NetworkSetItem(Network):
     def __str__(self) -> str:
         return self.__repr__()
 
-    def as_dict(self):
+    def as_dict(self) -> Dict[str, Any]:
         """
         Format prefix object as dictionary
 
@@ -57,11 +58,17 @@ class NetworkSet:
     """
     Common base class for network address prefix sets with caching
     """
-    type = 'generic'
-    cache_filename = None
+    type: str = 'generic'
+    cache_directory: Optional[str]
+    cache_filename: Optional[str] = None
+    updated: Optional[str]
+    __networks__: NetworkList
+    __iter_index__: Optional[int]
     loader_class = NetworkSetItem
 
-    def __init__(self, networks=None, cache_directory=None) -> None:
+    def __init__(self,
+                 networks: Optional[List[Network]] = None,
+                 cache_directory: Optional[str] = None) -> None:
         self.cache_directory = cache_directory
         self.updated = None
         self.__networks__ = NetworkList()
@@ -75,10 +82,10 @@ class NetworkSet:
     def __len__(self) -> int:
         return len(self.__networks__)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Network]:
         return self
 
-    def __next__(self):
+    def __next__(self) -> Network:
         if not self.__networks__:
             self.fetch()
         if self.__iter_index__ is None:
@@ -108,13 +115,15 @@ class NetworkSet:
         return IPSet([item.cidr for item in self.__networks__])
 
     @property
-    def merged(self):
+    def merged(self) -> 'NetworkSet':
         """
         Minimal merged set of IP range set covering network set
         """
-        return self.__class__(networks=[self.loader_class(network) for network in self.ipset.iter_cidrs()])
+        return self.__class__(
+            networks=[self.loader_class(network) for network in self.ipset.iter_cidrs()]
+        )
 
-    def fetch(self):
+    def fetch(self) -> None:
         """
         Fetch information for network
         """
@@ -129,7 +138,7 @@ class NetworkSet:
             'networks': [prefix.as_dict() for prefix in self.__networks__]
         }
 
-    def add_network(self, value) -> None:
+    def add_network(self, value: Any) -> None:
         """
         Add network to cache
         """
@@ -140,7 +149,7 @@ class NetworkSet:
         if network not in self.__networks__:
             self.__networks__.append(network)
 
-    def substract(self, networks) -> None:
+    def substract(self, networks: List[Network]) -> 'NetworkSet':
         """
         Return merged network set, with specified network removed
         """
@@ -154,7 +163,7 @@ class NetworkSet:
                 raise NetworkError(f'Error processing network {network}: {error}') from error
         return self.__class__(networks=[self.loader_class(network) for network in ipset.iter_cidrs()])
 
-    def __read_cache_file__(self):
+    def __read_cache_file__(self) -> str:
         """
         Read network set data cache file
         """

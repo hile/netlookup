@@ -18,7 +18,7 @@ RE_TEST_PATTERNS = (
 )
 
 
-def test_base_match_patterns_match_found():
+def test_base_match_patterns_match_found() -> None:
     """
     Test match_patterns function with found pattern matcn
     """
@@ -26,7 +26,7 @@ def test_base_match_patterns_match_found():
     assert match == {'number': '1234'}
 
 
-def test_base_match_patterns_no_match_found():
+def test_base_match_patterns_no_match_found() -> None:
     """
     Test match_patterns function with found pattern matcn
     """

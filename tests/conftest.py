@@ -70,14 +70,14 @@ class MockGoogleDnsAnswer(MockCalledMethod):
             raise ValueError(f'Unexpected query key: "{record}"') from error
 
 
-def mock_platform(monkeypatch, platform: str):
+def mock_platform(monkeypatch, platform: str) -> None:
     """
     Mock sys.platform value for specified environment
     """
     monkeypatch.setattr('sys.platform', platform)
 
 
-def mock_environment_services(monkeypatch, environment):
+def mock_environment_services(monkeypatch, environment) -> None:
     """
     Mock loading of environment's /etc/services from mock data
     """
@@ -87,7 +87,7 @@ def mock_environment_services(monkeypatch, environment):
     )
 
 
-def mock_environment_protocols(monkeypatch, environment):
+def mock_environment_protocols(monkeypatch, environment) -> None:
     """
     Mock loading of environment's /etc/protocols from mock data
     """

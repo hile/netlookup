@@ -23,6 +23,10 @@ class Protocol(FileItem):
     """
     Single protocol in the protocols file
     """
+    name: str
+    number: str
+    aliases: str
+    comment: str
     __patterns__: List[re.Pattern] = PROTOCOL_LINE_PATTERNS
 
     def __init__(self,

@@ -21,7 +21,7 @@ from dns.rrset import RRset
 from netlookup.network import Network
 
 
-def validate_network_compare_methods(network):
+def validate_network_compare_methods(network: Network) -> None:
     """
     Validate a network object's compare methods
     """
@@ -47,7 +47,7 @@ def validate_network_compare_methods(network):
         pass
 
 
-def validate_network(network):
+def validate_network(network: Network) -> None:
     """
     Validate a network object
     """

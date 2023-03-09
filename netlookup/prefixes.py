@@ -8,8 +8,10 @@ Network prefix cache objects
 """
 from operator import attrgetter
 from pathlib import Path
+from typing import Any, List, Optional, Union
 
-from .network import NetworkList, NetworkError, find_address_in_networks
+from .network import Network, NetworkList, NetworkError, find_address_in_networks
+from .network_sets.base import NetworkSet
 from .network_sets.constants import DEFAULT_CACHE_DIRECTORY
 from .network_sets.aws import AWS
 from .network_sets.cloudflare import Cloudflare
@@ -20,7 +22,10 @@ class Prefixes(NetworkList):
     """
     Loader and lookup for known IP address prefix caches for public clouds
     """
-    def __init__(self, cache_directory=None) -> None:
+    cache_directory: Path
+    vendors: List[NetworkSet]
+
+    def __init__(self, cache_directory: Optional[Union[str, Path]] = None) -> None:
         super().__init__()
         cache_directory = cache_directory if cache_directory is not None else DEFAULT_CACHE_DIRECTORY
         self.cache_directory = Path(cache_directory).expanduser()
@@ -37,7 +42,6 @@ class Prefixes(NetworkList):
             GoogleCloud(cache_directory=self.cache_directory),
             GoogleServices(cache_directory=self.cache_directory),
         ]
-
         self.load()
 
     def update(self) -> None:
@@ -71,13 +75,13 @@ class Prefixes(NetworkList):
                 self.append(prefix)
         self.sort(key=attrgetter('value'))
 
-    def filter_type(self, value):
+    def filter_type(self, value: Any):
         """
         Filter networks by type
         """
         return [prefix for prefix in self if prefix.type == value]
 
-    def get_vendor(self, name):
+    def get_vendor(self, name: str) -> NetworkSet:
         """
         Get vendor prefix set
         """
@@ -86,7 +90,7 @@ class Prefixes(NetworkList):
                 return vendor
         raise NetworkError(f'No such vendor: {name}')
 
-    def find(self, value):
+    def find(self, value: Any) -> Optional[Network]:
         """
         Find address in networks
         """

@@ -106,7 +106,7 @@ def test_prefixes_cache_properties_update(
         mock_aws_ip_ranges,
         mock_cloudflare_ip4_ranges,
         mock_cloudflare_ip6_ranges,
-        mock_google_dns_requests):
+        mock_google_dns_requests) -> None:
     """
     Test updating prefixes cache with mocked data
     """
@@ -126,7 +126,7 @@ def test_prefixes_cache_properties_update_permission_denied(
         mock_aws_ip_ranges,
         mock_cloudflare_ip4_ranges,
         mock_cloudflare_ip6_ranges,
-        mock_google_dns_requests):
+        mock_google_dns_requests) -> None:
     """
     Test updating prefixes cache with mocked data and a non-writable cache directory
     """
@@ -143,7 +143,7 @@ def test_prefixes_cache_properties_update_save_error(
         mock_aws_ip_ranges,
         mock_cloudflare_ip4_ranges,
         mock_cloudflare_ip6_ranges,
-        mock_google_dns_requests):
+        mock_google_dns_requests) -> None:
     """
     Test updating prefixes cache with mocked data and an error from network set save method
     """

@@ -9,7 +9,7 @@ Common base classes for network info text file parsers
 import re
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, List
+from typing import Any, Iterator, List
 
 
 def match_patterns(patterns: List[re.Pattern], line: str) -> dict:
@@ -52,7 +52,7 @@ class NetworkDataTextFile(Sequence):
     def __getitem__(self, index: int):
         return self.__items__.__getitem__(index)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Any]:
         return iter(self.__items__)
 
     def __len__(self) -> int:

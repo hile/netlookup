@@ -11,7 +11,7 @@ import json
 from netlookup.encoders import NetworkDataEncoder
 
 
-def test_encoders_output(network_encoder_output):
+def test_encoders_output(network_encoder_output) -> None:
     """
     Test
     """

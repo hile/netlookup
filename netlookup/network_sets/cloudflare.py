@@ -36,8 +36,8 @@ class Cloudflare(NetworkSet):
     """
     Network Set for cloudflare public addresses
     """
-    type = 'cloudflare'
-    cache_filename = 'cloudflare-networks.json'
+    type: str = 'cloudflare'
+    cache_filename: str = 'cloudflare-networks.json'
     loader_class = CloudflarePrefix
 
     def __get_ip_range_data__(self, url: str) -> List[str]:
