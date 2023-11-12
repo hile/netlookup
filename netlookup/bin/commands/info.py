@@ -26,7 +26,7 @@ class Info(BaseCommand):
         first = network.first_host
         last = network.last_host
         self.message(f'         CIDR {network.cidr}')
-        self.message(f'      Netmask {network.netmask}')
+        self.message(f'      Netmask {network.netmask} {network.netmask_hex_string}')
         self.message(f'      Network {network.network}')
         if network.broadcast is not None:
             self.message(f'    Broadcast {network.broadcast}')

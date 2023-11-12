@@ -23,6 +23,11 @@ class Split(BaseCommand):
         Add CLI arguments for netmask and subnet list
         """
         parser.add_argument(
+            '-a', '--address-only',
+            action='store_true',
+            help='Omit mask from output'
+        )
+        parser.add_argument(
             '-m', '--mask',
             type=int,
             help='Mask for split networks'
@@ -30,7 +35,7 @@ class Split(BaseCommand):
         parser.add_argument(
             'subnets',
             nargs='*',
-            help='Subnets to process'
+            help='Subnets to split'
         )
         return parser
 
@@ -45,7 +50,10 @@ class Split(BaseCommand):
             prefixlen = args.mask if args.mask is not None else network.next_subnet_prefix
             if prefixlen is not None:
                 for subnet in network.subnet(prefixlen):
-                    self.message(subnet)
+                    if args.address_only:
+                        self.message(subnet.ip)
+                    else:
+                        self.message(subnet)
             else:
                 self.error(f'Network is not splittable {network}')
             if self.errors:

@@ -106,6 +106,14 @@ class Network(IPNetwork):
         return self.value >= other
 
     @property
+    def netmask_hex_string(self) -> str:
+        """
+        Return the netmask value as 0x prefixed hex string
+        """
+        hexwords = ''.join(f'{word:x}' for word in self.netmask.words)
+        return f'0x{hexwords}'
+
+    @property
     def total_hosts(self) -> int:
         """
         Return total number of available hosts in subnet, excluding network and

@@ -33,7 +33,28 @@ def test_netlookup_split_splittable_network(capsys, monkeypatch, mock_prefixes_d
 
     captured = capsys.readouterr()
     assert captured.err == ''
-    assert len(captured.out.splitlines()) > 0
+    lines = captured.out.splitlines()
+    assert len(lines) > 0
+    for line in lines:
+        assert line.count('/') == 1
+
+
+# pylint: disable=unused-argument
+def test_netlookup_split_splittable_network_address_only(capsys, monkeypatch, mock_prefixes_data, splittable_network):
+    """
+    Test running 'netlookup split' command with valid and splittable address valules
+    """
+    script = NetLookupScript()
+    testargs = ['netlookup', 'split', '--address-only', splittable_network]
+    with monkeypatch.context() as context:
+        validate_script_run_exception_with_args(script, context, testargs, exit_code=0)
+
+    captured = capsys.readouterr()
+    assert captured.err == ''
+    lines = captured.out.splitlines()
+    assert len(lines) > 0
+    for line in lines:
+        assert line.count('/') == 0
 
 
 # pylint: disable=unused-argument

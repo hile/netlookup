@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "netlookup"
-version = "2.0.2"
-description = "Python tools to look up information about networks"
+version = "2.1.0"
+description = "Python tool to look up information about networks"
 authors = ["Ilkka Tuohela <hile@iki.fi>"]
 homepage = "https://github.com/hile/netlookup"
 readme = "README.md"

@@ -64,7 +64,7 @@ class MockGoogleDnsAnswer(MockCalledMethod):
         """
         super().__call__(record=record, rrtype=rrtype)
         try:
-            record = f'{record.rstrip(".")}.'
+            record = f"""{record.rstrip('.')}."""
             return create_dns_txt_query_response(record, GOOGLE_NETWORK_SET_SPF_RECORDS[record])
         except KeyError as error:
             raise ValueError(f'Unexpected query key: "{record}"') from error
